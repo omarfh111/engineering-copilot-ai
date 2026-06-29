@@ -1,0 +1,6 @@
+model,provider,collection,questions_evaluated,avg_hit_at_5_file,avg_precision_at_5_file,avg_recall_at_5_file,avg_mrr_file,avg_hit_at_5_category,avg_retrieval_time_seconds
+text-embedding-3-small,openai,exp_openai_text_embedding_3_small,64,0.9219,0.7562,0.9036,0.8385,0.9531,1.167
+sentence-transformers/all-MiniLM-L6-v2,sentence_transformers,exp_minilm_l6_v2,64,0.8906,0.7,0.875,0.8203,0.9375,3.3034
+qwen3-embedding:8b,ollama,exp_qwen3_embedding_8b,64,0.8906,0.7219,0.8724,0.8065,0.9531,2.6933
+BAAI/bge-m3,sentence_transformers,exp_bge_m3,64,0.8125,0.6531,0.7969,0.7708,0.9062,6.131
+nomic-ai/nomic-embed-text-v1.5,sentence_transformers,exp_nomic_embed_text_v15,64,0.7188,0.5625,0.6849,0.6523,0.8125,6.4037

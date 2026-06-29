@@ -1,0 +1,1275 @@
+{
+  "meta": {
+    "name": "rag_golden_eval_v1",
+    "created": "2026-06-29",
+    "task": "retrieval_only",
+    "grading": "Compare retrieved chunks' (source, page) against relevant_chunks. Compute recall@k, precision@k, MRR, hit@k. For negative items, success = no chunk above similarity threshold / system refuses.",
+    "corpus_docs": 19,
+    "total_pages": 2967,
+    "question_count": 64,
+    "type_counts": {
+      "factual": 28,
+      "cross_doc": 16,
+      "multi_hop": 10,
+      "negative": 10
+    },
+    "doc_keys": {
+      "clean_arch": "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+      "micro": "architecture/Microservices_Designing_Deploying.pdf",
+      "hex": "architecture/hexagonal-architectures.pdf",
+      "nist_cloud": "architecture/nistspecialpublication500-292.pdf",
+      "java": "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+      "pep8": "coding_standards/Python_PEP8_TheStyleGuideForPythonCode.pdf",
+      "sonar": "coding_standards/SonarQube_in_Action.pdf",
+      "solid": "coding_standards/The_SOLID_Principles.pdf",
+      "clean": "coding_standards/clean-code.pdf",
+      "best": "coding_standards/coding_best_practices_2020-06-03.pdf",
+      "fastapi": "framework_docs/PDFFastAPISlides.pdf",
+      "docker": "framework_docs/docker-tutorial.pdf",
+      "k8s": "framework_docs/ri3_k8s_101.pdf",
+      "spring": "framework_docs/spring-boot-reference.pdf",
+      "asvs": "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf",
+      "scp": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+      "ssdf": "security/nist.sp.800-218.pdf",
+      "apitop10": "security/owasp-api-security-top-10.pdf",
+      "owasp_prep": "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf"
+    },
+    "schema": {
+      "relevant_chunks[].source": "exact PDF path key (category/filename.pdf)",
+      "relevant_chunks[].pages": "1-indexed source pages containing the ground-truth answer span",
+      "relevant_chunks[].category": "top-level folder",
+      "negative items": "empty relevant_chunks + expected_behavior flag"
+    },
+    "caveats": [
+      "owasp-api-security-top-10.pdf is bilingual FR/EN — embeddings/chunking must handle mixed language.",
+      "PEP8 and SonarQube PDFs extract sparsely (slide/scan-like layout) — verify your loader captures their text.",
+      "Page numbers are PDF page indices (1-based), not printed page numbers — align with however your loader tags pages.",
+      "Pages were verified via keyword grep, but you should spot-check 5-10 records against your chunker's actual page tagging before trusting metrics."
+    ]
+  },
+  "questions": [
+    {
+      "id": "F01",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What does API4:2019 in the OWASP API Security Top 10 cover?",
+      "relevant_chunks": [
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            2,
+            7
+          ]
+        }
+      ],
+      "notes": "Lack of Resources & Rate Limiting; doc is bilingual FR/EN"
+    },
+    {
+      "id": "F02",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What is API6:2019 (Mass Assignment) and what causes it?",
+      "relevant_chunks": [
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            2,
+            7
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F03",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "According to the OWASP Secure Coding Practices guide, on what kind of system should all data validation be conducted?",
+      "relevant_chunks": [
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            5
+          ]
+        }
+      ],
+      "notes": "Answer: a trusted system, e.g. the server [item 1]"
+    },
+    {
+      "id": "F04",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What does the OWASP SCP checklist say applications should do with session identifiers (item 58)?",
+      "relevant_chunks": [
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            7
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F05",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What is the first practice group of the NIST SSDF (SP 800-218)?",
+      "relevant_chunks": [
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        }
+      ],
+      "notes": "Prepare the Organization (PO)"
+    },
+    {
+      "id": "F06",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What is the formal title and version of NIST SP 800-218?",
+      "relevant_chunks": [
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F07",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "Quote the Single Responsibility Principle as stated by Robert C. Martin.",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            13,
+            17
+          ]
+        }
+      ],
+      "notes": "'A class should have only one reason to change'"
+    },
+    {
+      "id": "F08",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "List the five SOLID principles.",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            8,
+            9
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F09",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "In Clean Code, what does guideline G30 state functions should do?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/clean-code.pdf",
+          "category": "coding_standards",
+          "pages": [
+            16
+          ]
+        }
+      ],
+      "notes": "Functions Should Do One Thing"
+    },
+    {
+      "id": "F10",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What is the main title and authoring body of the cloud reference architecture document?",
+      "relevant_chunks": [
+        {
+          "source": "architecture/nistspecialpublication500-292.pdf",
+          "category": "architecture",
+          "pages": [
+            1
+          ]
+        }
+      ],
+      "notes": "NIST Cloud Computing Reference Architecture"
+    },
+    {
+      "id": "F11",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "In the Docker tutorial, what does the -v / --volume flag do?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/docker-tutorial.pdf",
+          "category": "framework_docs",
+          "pages": [
+            14
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F12",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What kubectl command creates an nginx deployment with 3 replicas?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/ri3_k8s_101.pdf",
+          "category": "framework_docs",
+          "pages": [
+            16,
+            17
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F13",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What are the two core building blocks of hexagonal architecture per the AWS guide?",
+      "relevant_chunks": [
+        {
+          "source": "architecture/hexagonal-architectures.pdf",
+          "category": "architecture",
+          "pages": [
+            3,
+            6
+          ]
+        }
+      ],
+      "notes": "ports and adapters"
+    },
+    {
+      "id": "F14",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "Who authored the Microservices: Designing/Deploying ebook and for which company?",
+      "relevant_chunks": [
+        {
+          "source": "architecture/Microservices_Designing_Deploying.pdf",
+          "category": "architecture",
+          "pages": [
+            2
+          ]
+        }
+      ],
+      "notes": "Chris Richardson with Floyd Smith, NGINX"
+    },
+    {
+      "id": "F15",
+      "type": "factual",
+      "difficulty": "hard",
+      "question": "Where in the Spring Boot reference is 'Creating Your Own Starter' documented?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/spring-boot-reference.pdf",
+          "category": "framework_docs",
+          "pages": [
+            10
+          ]
+        }
+      ],
+      "notes": "section 4.29.5"
+    },
+    {
+      "id": "F16",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What is PEP 8?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/Python_PEP8_TheStyleGuideForPythonCode.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        }
+      ],
+      "notes": "PEP8 extracts sparsely; chunker should handle"
+    },
+    {
+      "id": "F17",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What does OWASP SCP recommend for output encoding (items 17-19)?",
+      "relevant_chunks": [
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            5
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F18",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What does API1:2019 Broken Object Level Authorization describe?",
+      "relevant_chunks": [
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            7,
+            8
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F19",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "According to SSDF, what should organizations ensure when they 'Prepare the Organization'?",
+      "relevant_chunks": [
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F20",
+      "type": "factual",
+      "difficulty": "hard",
+      "question": "What statutory authority does NIST cite for publishing SP 800-218?",
+      "relevant_chunks": [
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            3
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F21",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What are the main parts/sections of the Docker tutorial?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/docker-tutorial.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F22",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "In the SOLID document, who are credited as influences alongside Robert C. Martin?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            9
+          ]
+        }
+      ],
+      "notes": "Michael Feathers"
+    },
+    {
+      "id": "F23",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What is the Liskov Substitution Principle's position in the SOLID list?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            8,
+            9
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F24",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What is the subject of the ri3_k8s_101 deck?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/ri3_k8s_101.pdf",
+          "category": "framework_docs",
+          "pages": [
+            13
+          ]
+        }
+      ],
+      "notes": "Introduction à Kubernetes (French)"
+    },
+    {
+      "id": "F25",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "What does the OWASP SCP guide cover under Authentication and Password Management (item 23)?",
+      "relevant_chunks": [
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            6
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F26",
+      "type": "factual",
+      "difficulty": "hard",
+      "question": "What does Spring Boot section 3.1.5 cover?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/spring-boot-reference.pdf",
+          "category": "framework_docs",
+          "pages": [
+            3
+          ]
+        }
+      ],
+      "notes": "Starters"
+    },
+    {
+      "id": "F27",
+      "type": "factual",
+      "difficulty": "easy",
+      "question": "What architectural style is the subject of the AWS Prescriptive Guidance doc?",
+      "relevant_chunks": [
+        {
+          "source": "architecture/hexagonal-architectures.pdf",
+          "category": "architecture",
+          "pages": [
+            1,
+            2
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "F28",
+      "type": "factual",
+      "difficulty": "medium",
+      "question": "Per Clean Code's table of contents, what is the first major topic under Functions?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/clean-code.pdf",
+          "category": "coding_standards",
+          "pages": [
+            9
+          ]
+        }
+      ],
+      "notes": "Do One Thing / small functions"
+    },
+    {
+      "id": "X01",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "How do the OWASP API Top 10 and the OWASP Secure Coding Practices guide each address input/data validation?",
+      "relevant_chunks": [
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            7
+          ]
+        },
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            5
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X02",
+      "type": "cross_doc",
+      "difficulty": "hard",
+      "question": "Compare how NIST SSDF and the OWASP Secure Coding Practices guide structure secure-development guidance (framework groups vs checklist).",
+      "relevant_chunks": [
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        },
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            5,
+            6,
+            7
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X03",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "Both Clean Code and the SOLID document emphasize single responsibility — how does each frame it?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/clean-code.pdf",
+          "category": "coding_standards",
+          "pages": [
+            16
+          ]
+        },
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            13,
+            17
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X04",
+      "type": "cross_doc",
+      "difficulty": "hard",
+      "question": "How do hexagonal architecture and microservices architecture each approach decoupling and boundaries?",
+      "relevant_chunks": [
+        {
+          "source": "architecture/hexagonal-architectures.pdf",
+          "category": "architecture",
+          "pages": [
+            3
+          ]
+        },
+        {
+          "source": "architecture/Microservices_Designing_Deploying.pdf",
+          "category": "architecture",
+          "pages": [
+            3
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X05",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "What container/orchestration concepts connect the Docker tutorial and the Kubernetes deck (e.g. images to pods/replicas)?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/docker-tutorial.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1,
+            14
+          ]
+        },
+        {
+          "source": "framework_docs/ri3_k8s_101.pdf",
+          "category": "framework_docs",
+          "pages": [
+            16,
+            35
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X06",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "How do PEP 8 and Clean Code each treat code readability and naming?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/Python_PEP8_TheStyleGuideForPythonCode.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "coding_standards/clean-code.pdf",
+          "category": "coding_standards",
+          "pages": [
+            9
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X07",
+      "type": "cross_doc",
+      "difficulty": "hard",
+      "question": "Across the three security docs (API Top 10, SCP, SSDF), how is rate limiting / resource control addressed?",
+      "relevant_chunks": [
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            7
+          ]
+        },
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            6
+          ]
+        },
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X08",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "How do the NIST Cloud Reference Architecture and the microservices ebook describe service deployment concerns differently?",
+      "relevant_chunks": [
+        {
+          "source": "architecture/nistspecialpublication500-292.pdf",
+          "category": "architecture",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "architecture/Microservices_Designing_Deploying.pdf",
+          "category": "architecture",
+          "pages": [
+            1,
+            3
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X09",
+      "type": "cross_doc",
+      "difficulty": "hard",
+      "question": "Compare the dependency-management philosophy in SOLID (Dependency Inversion) with Spring Boot's auto-configuration/starters approach.",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            8,
+            9
+          ]
+        },
+        {
+          "source": "framework_docs/spring-boot-reference.pdf",
+          "category": "framework_docs",
+          "pages": [
+            3,
+            10
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X10",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "How do the OWASP ASVS and OWASP SCP guides relate as security verification vs coding-practice references?",
+      "relevant_chunks": [
+        {
+          "source": "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf",
+          "category": "security",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            2,
+            5
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X11",
+      "type": "cross_doc",
+      "difficulty": "hard",
+      "question": "What guidance do SSDF and OWASP 'Preparing for the new Top 10' give on evolving/maintaining security posture?",
+      "relevant_chunks": [
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        },
+        {
+          "source": "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "category": "security",
+          "pages": [
+            1
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X12",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "How do the FastAPI slides and Spring Boot reference each present framework getting-started/structure?",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/PDFFastAPISlides.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "framework_docs/spring-boot-reference.pdf",
+          "category": "framework_docs",
+          "pages": [
+            3
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X13",
+      "type": "cross_doc",
+      "difficulty": "hard",
+      "question": "Compare how Clean Architecture and hexagonal architecture isolate the domain from external concerns.",
+      "relevant_chunks": [
+        {
+          "source": "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "category": "architecture",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "architecture/hexagonal-architectures.pdf",
+          "category": "architecture",
+          "pages": [
+            3,
+            6
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X14",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "Both the Java Coding Guidelines and OWASP SCP target secure programs — how do their scopes differ?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            5,
+            6
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X15",
+      "type": "cross_doc",
+      "difficulty": "hard",
+      "question": "How do SonarQube (static analysis) and the SSDF framework complement each other in a secure SDLC?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/SonarQube_in_Action.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "X16",
+      "type": "cross_doc",
+      "difficulty": "medium",
+      "question": "Compare how the Docker tutorial and microservices ebook motivate containerization/independent deployment.",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/docker-tutorial.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "architecture/Microservices_Designing_Deploying.pdf",
+          "category": "architecture",
+          "pages": [
+            3
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M01",
+      "type": "multi_hop",
+      "difficulty": "hard",
+      "question": "If a Python microservice exposes an API endpoint, which docs together inform (a) its code style, (b) its API authz risk, and (c) its container deployment?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/Python_PEP8_TheStyleGuideForPythonCode.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            7,
+            8
+          ]
+        },
+        {
+          "source": "framework_docs/docker-tutorial.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1,
+            14
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M02",
+      "type": "multi_hop",
+      "difficulty": "hard",
+      "question": "To secure a Spring Boot REST API end-to-end, trace guidance from secure coding practices, to API-specific risks, to a secure-SDLC framework.",
+      "relevant_chunks": [
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            5,
+            6
+          ]
+        },
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            7
+          ]
+        },
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M03",
+      "type": "multi_hop",
+      "difficulty": "hard",
+      "question": "A team wants SOLID-compliant code verified by tooling and deployed on Kubernetes — which docs cover the design principle, the verification, and the orchestration?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            13
+          ]
+        },
+        {
+          "source": "coding_standards/SonarQube_in_Action.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "framework_docs/ri3_k8s_101.pdf",
+          "category": "framework_docs",
+          "pages": [
+            16
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M04",
+      "type": "multi_hop",
+      "difficulty": "hard",
+      "question": "For a cloud-native hexagonal app, which sources cover the architectural pattern, the cloud reference model, and the deployment unit?",
+      "relevant_chunks": [
+        {
+          "source": "architecture/hexagonal-architectures.pdf",
+          "category": "architecture",
+          "pages": [
+            3,
+            6
+          ]
+        },
+        {
+          "source": "architecture/nistspecialpublication500-292.pdf",
+          "category": "architecture",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "framework_docs/docker-tutorial.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M05",
+      "type": "multi_hop",
+      "difficulty": "medium",
+      "question": "Mapping 'one reason to change' to a verification tool: which doc states the principle and which doc would flag violations?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/The_SOLID_Principles.pdf",
+          "category": "coding_standards",
+          "pages": [
+            17
+          ]
+        },
+        {
+          "source": "coding_standards/SonarQube_in_Action.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M06",
+      "type": "multi_hop",
+      "difficulty": "hard",
+      "question": "To prevent mass-assignment in a Java API, which docs give (a) the API risk, (b) Java-specific secure coding, and (c) general input-validation practice?",
+      "relevant_chunks": [
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            7
+          ]
+        },
+        {
+          "source": "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "category": "coding_standards",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            5
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M07",
+      "type": "multi_hop",
+      "difficulty": "hard",
+      "question": "A reviewer checks rate limiting: identify the API risk doc, the secure-coding checklist item, and the SDLC practice that institutionalizes it.",
+      "relevant_chunks": [
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            2,
+            7
+          ]
+        },
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            6
+          ]
+        },
+        {
+          "source": "security/nist.sp.800-218.pdf",
+          "category": "security",
+          "pages": [
+            13
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M08",
+      "type": "multi_hop",
+      "difficulty": "medium",
+      "question": "To package and scale a FastAPI app, trace from the framework intro, to containerization, to replica scaling.",
+      "relevant_chunks": [
+        {
+          "source": "framework_docs/PDFFastAPISlides.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1
+          ]
+        },
+        {
+          "source": "framework_docs/docker-tutorial.pdf",
+          "category": "framework_docs",
+          "pages": [
+            1,
+            14
+          ]
+        },
+        {
+          "source": "framework_docs/ri3_k8s_101.pdf",
+          "category": "framework_docs",
+          "pages": [
+            16,
+            35
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M09",
+      "type": "multi_hop",
+      "difficulty": "hard",
+      "question": "Connecting clean functions to architecture: which doc defines 'do one thing' and which defines domain isolation via ports/adapters?",
+      "relevant_chunks": [
+        {
+          "source": "coding_standards/clean-code.pdf",
+          "category": "coding_standards",
+          "pages": [
+            16
+          ]
+        },
+        {
+          "source": "architecture/hexagonal-architectures.pdf",
+          "category": "architecture",
+          "pages": [
+            3,
+            6
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "M10",
+      "type": "multi_hop",
+      "difficulty": "medium",
+      "question": "For session security in a web app, link the OWASP SCP session-management items to the broader API Top 10 authorization risks.",
+      "relevant_chunks": [
+        {
+          "source": "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "category": "security",
+          "pages": [
+            7
+          ]
+        },
+        {
+          "source": "security/owasp-api-security-top-10.pdf",
+          "category": "security",
+          "pages": [
+            7,
+            8
+          ]
+        }
+      ],
+      "notes": ""
+    },
+    {
+      "id": "N01",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "What were the Q3 2025 revenue figures for NVIDIA?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Finance — not in corpus"
+    },
+    {
+      "id": "N02",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "How do I treat a sourdough starter that won't rise?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Cooking — out of scope"
+    },
+    {
+      "id": "N03",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "What is the capital of Australia?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "General trivia — not in corpus"
+    },
+    {
+      "id": "N04",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "Explain the rules of cricket's LBW dismissal.",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Sports — out of scope"
+    },
+    {
+      "id": "N05",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "What's the recommended dosage of ibuprofen for adults?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Medical — out of scope"
+    },
+    {
+      "id": "N06",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "How do I configure a React useEffect cleanup function?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Frontend/React — no React doc in corpus (FastAPI/Spring/Docker/K8s only)"
+    },
+    {
+      "id": "N07",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "What is the GDPR fine for a data breach under Article 83?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Legal/regulatory text — not in corpus"
+    },
+    {
+      "id": "N08",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "Give me the lyrics to a popular pop song.",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Copyright + out of scope"
+    },
+    {
+      "id": "N09",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "What is the best cross-sectional momentum lookback window for crypto trading?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Quant finance — not in corpus"
+    },
+    {
+      "id": "N10",
+      "type": "negative",
+      "difficulty": "easy",
+      "question": "How do I assemble IKEA furniture without the manual?",
+      "relevant_chunks": [],
+      "expected_behavior": "no_relevant_chunks_should_refuse",
+      "notes": "Unrelated — out of scope"
+    }
+  ]
+}

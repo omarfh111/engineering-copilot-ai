@@ -8,6 +8,7 @@ sqlalchemy
 psycopg2-binary
 alembic
 
+tqdm
 qdrant-client
 sentence-transformers
 
@@ -37,3 +38,13 @@ pymupdf
 sqlalchemy
 psycopg2-binary
 alembic
+
+pymupdf
+python-docx
+beautifulsoup4
+markdown
+
+sentence-transformers
+openai
+requests
+pandas

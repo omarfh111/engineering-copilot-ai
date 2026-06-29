@@ -1,0 +1,6 @@
+provider,model,status,chunks_tested,dimension,load_time_seconds,embedding_time_seconds,avg_time_per_chunk_seconds,error
+ollama,qwen3-embedding:8b,success,80,4096,0.0,50.534,0.6317,
+openai,text-embedding-3-small,success,80,1536,0.0,5.897,0.0737,
+sentence_transformers,sentence-transformers/all-MiniLM-L6-v2,success,80,384,3.938,1.863,0.0233,
+sentence_transformers,BAAI/bge-m3,success,80,1024,6.094,46.95,0.5869,
+sentence_transformers,nomic-ai/nomic-embed-text-v1.5,success,80,768,49.492,18.786,0.2348,

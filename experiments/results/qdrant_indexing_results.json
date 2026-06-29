@@ -1,0 +1,62 @@
+[
+  {
+    "provider": "ollama",
+    "model": "qwen3-embedding:8b",
+    "collection": "exp_qwen3_embedding_8b",
+    "dimension": 4096,
+    "chunks_indexed": 800,
+    "points_count": 800,
+    "total_time_seconds": 378.794,
+    "avg_time_per_chunk_seconds": 0.4735,
+    "status": "success",
+    "error": ""
+  },
+  {
+    "provider": "openai",
+    "model": "text-embedding-3-small",
+    "collection": "exp_openai_text_embedding_3_small",
+    "dimension": 1536,
+    "chunks_indexed": 800,
+    "points_count": 800,
+    "total_time_seconds": 35.847,
+    "avg_time_per_chunk_seconds": 0.0448,
+    "status": "success",
+    "error": ""
+  },
+  {
+    "provider": "sentence_transformers",
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "collection": "exp_minilm_l6_v2",
+    "dimension": 384,
+    "chunks_indexed": 800,
+    "points_count": 800,
+    "total_time_seconds": 25.521,
+    "avg_time_per_chunk_seconds": 0.0319,
+    "status": "success",
+    "error": ""
+  },
+  {
+    "provider": "sentence_transformers",
+    "model": "BAAI/bge-m3",
+    "collection": "exp_bge_m3",
+    "dimension": 1024,
+    "chunks_indexed": 800,
+    "points_count": 800,
+    "total_time_seconds": 491.929,
+    "avg_time_per_chunk_seconds": 0.6149,
+    "status": "success",
+    "error": ""
+  },
+  {
+    "provider": "sentence_transformers",
+    "model": "nomic-ai/nomic-embed-text-v1.5",
+    "collection": "exp_nomic_embed_text_v15",
+    "dimension": 768,
+    "chunks_indexed": 800,
+    "points_count": 800,
+    "total_time_seconds": 222.846,
+    "avg_time_per_chunk_seconds": 0.2786,
+    "status": "success",
+    "error": ""
+  }
+]
