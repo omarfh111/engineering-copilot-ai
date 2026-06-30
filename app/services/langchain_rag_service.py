@@ -1,33 +1,33 @@
 """
-RAG service for Engineering Copilot AI.
+LangChain RAG service for Engineering Copilot AI.
 
-This service performs the complete RAG pipeline:
+This version keeps our validated retrieval pipeline:
+- EmbeddingService
+- QdrantService
+- RerankerService
 
-User question
-↓
-Embedding
-↓
-Qdrant retrieval
-↓
-Reranking
-↓
-Context building
-↓
-LLM answer generation
+And uses LangChain for:
+- PromptTemplate
+- ChatOpenAI
+- chain execution
 """
 
 from typing import Dict, List, Optional
 
-from openai import OpenAI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
 
 from app.core.config import settings
 from app.core.logging import logger
 from app.services.embedding_service import EmbeddingService
 from app.services.qdrant_service import QdrantService
 from app.services.reranker_service import RerankerService
+from app.services.llm_reranker_service import LLMRerankerService
+import os
+from langsmith import traceable
 
-
-class RAGService:
+class LangChainRAGService:
     def __init__(
         self,
         collection_name: str,
@@ -36,12 +36,12 @@ class RAGService:
         llm_model: Optional[str] = None,
         retrieval_top_k: int = 10,
         final_top_k: int = 5,
-        use_reranker: bool = True,
+        reranker_type: str = "cross_encoder",
     ):
         self.collection_name = collection_name
         self.retrieval_top_k = retrieval_top_k
         self.final_top_k = final_top_k
-        self.use_reranker = use_reranker
+        self.reranker_type = reranker_type
 
         self.llm_model = llm_model or getattr(
             settings,
@@ -56,18 +56,73 @@ class RAGService:
 
         self.qdrant_service = QdrantService()
 
-        self.reranker_service = RerankerService() if use_reranker else None
+        if self.reranker_type == "cross_encoder":
+            self.reranker_service = RerankerService()
+        elif self.reranker_type == "llm":
+            self.reranker_service = LLMRerankerService(
+                model_name=self.llm_model,
+            )
+        elif self.reranker_type == "none":
+            self.reranker_service = None
+        else:
+            raise ValueError(f"Unsupported reranker_type: {self.reranker_type}")
 
-        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        self.llm = ChatOpenAI(
+            model=self.llm_model,
+            api_key=settings.OPENAI_API_KEY,
+            temperature=0.2,
+        )
 
+        self.prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+"""
+You are Engineering Copilot AI, an assistant specialized in software engineering,
+software architecture, clean code, cybersecurity, and documentation.
+
+You must answer only using the provided context.
+If the context is not enough, say that the documents do not contain enough information.
+
+If the user asks a broad or general question, synthesize a general answer from the retrieved context instead of listing only isolated implementation details.
+
+Always be clear, structured, and practical.
+When possible, mention the source file and page.
+""",
+                ),
+                (
+                    "human",
+                    """
+Question:
+{question}
+
+Context:
+{context}
+
+Answer in French.
+""",
+                ),
+            ]
+        )
+
+        self.chain = self.prompt | self.llm | StrOutputParser()
+        os.environ["LANGCHAIN_TRACING_V2"] = str(
+            getattr(settings, "LANGCHAIN_TRACING_V2", "true")
+        ).lower()
+
+        os.environ["LANGCHAIN_PROJECT"] = str(
+            getattr(settings, "LANGCHAIN_PROJECT", "engineering-copilot-rag")
+        )
+        if getattr(settings, "LANGCHAIN_API_KEY", None):
+            os.environ["LANGCHAIN_API_KEY"] = str(settings.LANGCHAIN_API_KEY)
         logger.info(
-            "RAGService initialized | "
+            "LangChainRAGService initialized | "
             f"collection={collection_name} | "
             f"embedding={embedding_model} | "
             f"llm={self.llm_model} | "
-            f"reranker={use_reranker}"
+            f"reranker_type={self.reranker_type}"
         )
-
+    @traceable(name="Retrieve relevant chunks")
     def retrieve(
         self,
         question: str,
@@ -85,7 +140,7 @@ class RAGService:
             category=category,
         )
 
-        if self.use_reranker and self.reranker_service is not None:
+        if self.reranker_service is not None:
             return self.reranker_service.rerank(
                 query=question,
                 retrieved_chunks=retrieved_chunks,
@@ -93,7 +148,7 @@ class RAGService:
             )
 
         return retrieved_chunks[: self.final_top_k]
-
+    @traceable(name="Build RAG context")
     def build_context(self, chunks: List[Dict]) -> str:
         if not chunks:
             return ""
@@ -113,7 +168,7 @@ class RAGService:
             )
 
         return "\n\n---\n\n".join(context_parts)
-
+    @traceable(name="Generate answer with LangChain")
     def generate_answer(
         self,
         question: str,
@@ -125,43 +180,13 @@ class RAGService:
                 "pour répondre correctement à cette question."
             )
 
-        system_prompt = """
-You are Engineering Copilot AI, an assistant specialized in software engineering,
-software architecture, clean code, cybersecurity, and documentation.
-
-You must answer only using the provided context.
-If the context is not enough, say that the documents do not contain enough information.
-Always be clear, structured, and practical.
-When possible, mention the source file and page.
-"""
-
-        user_prompt = f"""
-Question:
-{question}
-
-Context:
-{context}
-
-Answer in French.
-"""
-
-        response = self.openai_client.chat.completions.create(
-            model=self.llm_model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt.strip(),
-                },
-                {
-                    "role": "user",
-                    "content": user_prompt.strip(),
-                },
-            ],
-            temperature=0.2,
+        return self.chain.invoke(
+            {
+                "question": question,
+                "context": context,
+            }
         )
-
-        return response.choices[0].message.content
-
+    @traceable(name="Answer question with RAG")
     def answer_question(
         self,
         question: str,
@@ -197,5 +222,6 @@ Answer in French.
             "collection_name": self.collection_name,
             "retrieval_top_k": self.retrieval_top_k,
             "final_top_k": self.final_top_k,
-            "use_reranker": self.use_reranker,
+            "reranker_type": self.reranker_type,
+            "framework": "langchain",
         }

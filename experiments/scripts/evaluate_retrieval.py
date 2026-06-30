@@ -12,7 +12,7 @@ Inputs:
     experiments/results/retrieval_results.json
     experiments/data/evaluation/rag_golden_eval_v1.json
 
-Output:
+Outputs:
     experiments/results/retrieval_evaluation_summary.json
     experiments/results/retrieval_evaluation_summary.csv
 """
@@ -33,7 +33,7 @@ RETRIEVAL_RESULTS_FILE = (
     PROJECT_ROOT
     / "experiments"
     / "results"
-    / "retrieval_results.json"
+    / "reranked_results.json"
 )
 
 GOLDEN_FILE = (
@@ -48,14 +48,14 @@ OUTPUT_JSON = (
     PROJECT_ROOT
     / "experiments"
     / "results"
-    / "retrieval_evaluation_summary.json"
+    / "reranked_evaluation_summary.json"
 )
 
 OUTPUT_CSV = (
     PROJECT_ROOT
     / "experiments"
     / "results"
-    / "retrieval_evaluation_summary.csv"
+    / "reranked_evaluation_summary.csv"
 )
 
 
@@ -101,11 +101,26 @@ def get_expected_categories(question_data: Dict) -> Set[str]:
     return expected_categories
 
 
-def evaluate_single_result(result: Dict, golden_question: Dict) -> Dict:
+def get_eval_k(retrieval_results: List[Dict]) -> int:
+    """
+    Detect K automatically from retrieval results.
+    Example:
+        if each result has 10 retrieved chunks => K = 10
+    """
+    for item in retrieval_results:
+        results = item.get("results", [])
+        if results:
+            return len(results)
+
+    return 0
+
+
+def evaluate_single_result(result: Dict, golden_question: Dict, eval_k: int) -> Dict:
     expected_files = get_expected_filenames(golden_question)
     expected_categories = get_expected_categories(golden_question)
 
     retrieved_results = result.get("results", [])
+
     retrieved_files = [
         normalize_filename(item.get("filename", ""))
         for item in retrieved_results
@@ -118,15 +133,14 @@ def evaluate_single_result(result: Dict, golden_question: Dict) -> Dict:
 
     is_negative = len(expected_files) == 0
 
-    if is_negative:
-        # For now, simple negative check:
-        # success if no strong result above threshold.
-        # Since similarity scales differ by model, this is approximate.
-        max_score = max(
-            [item.get("score", 0) for item in retrieved_results],
-            default=0,
-        )
+    max_score = max(
+        [item.get("score", 0) for item in retrieved_results],
+        default=0,
+    )
 
+    if is_negative:
+        # Simple negative check.
+        # Later we can tune this threshold per model.
         negative_success = max_score < 0.45
 
         return {
@@ -136,12 +150,13 @@ def evaluate_single_result(result: Dict, golden_question: Dict) -> Dict:
             "model": result["model"],
             "provider": result["provider"],
             "collection": result["collection"],
+            "eval_k": eval_k,
             "is_negative": True,
-            "hit_at_5_file": int(negative_success),
-            "precision_at_5_file": 1.0 if negative_success else 0.0,
-            "recall_at_5_file": 1.0 if negative_success else 0.0,
+            "hit_file": int(negative_success),
+            "precision_file": 1.0 if negative_success else 0.0,
+            "recall_file": 1.0 if negative_success else 0.0,
             "mrr_file": 1.0 if negative_success else 0.0,
-            "hit_at_5_category": int(negative_success),
+            "hit_category": int(negative_success),
             "retrieval_time_seconds": result.get("retrieval_time_seconds"),
             "expected_files": [],
             "retrieved_files": retrieved_files,
@@ -156,15 +171,21 @@ def evaluate_single_result(result: Dict, golden_question: Dict) -> Dict:
         if filename in expected_files:
             hit_positions.append(index)
 
-    hit_at_5_file = 1 if hit_positions else 0
+    hit_file = 1 if hit_positions else 0
 
     relevant_retrieved_count = sum(
         1 for filename in retrieved_files if filename in expected_files
     )
 
-    precision_at_5_file = relevant_retrieved_count / 5
+    actual_k = len(retrieved_results)
 
-    recall_at_5_file = (
+    precision_file = (
+        relevant_retrieved_count / actual_k
+        if actual_k
+        else 0
+    )
+
+    recall_file = (
         relevant_retrieved_count / len(expected_files)
         if expected_files
         else 0
@@ -176,7 +197,7 @@ def evaluate_single_result(result: Dict, golden_question: Dict) -> Dict:
         1 for category in retrieved_categories if category in expected_categories
     )
 
-    hit_at_5_category = 1 if category_hit_count > 0 else 0
+    hit_category = 1 if category_hit_count > 0 else 0
 
     return {
         "question_id": result["question_id"],
@@ -185,21 +206,19 @@ def evaluate_single_result(result: Dict, golden_question: Dict) -> Dict:
         "model": result["model"],
         "provider": result["provider"],
         "collection": result["collection"],
+        "eval_k": eval_k,
         "is_negative": False,
-        "hit_at_5_file": hit_at_5_file,
-        "precision_at_5_file": round(precision_at_5_file, 4),
-        "recall_at_5_file": round(min(recall_at_5_file, 1.0), 4),
+        "hit_file": hit_file,
+        "precision_file": round(precision_file, 4),
+        "recall_file": round(min(recall_file, 1.0), 4),
         "mrr_file": round(mrr_file, 4),
-        "hit_at_5_category": hit_at_5_category,
+        "hit_category": hit_category,
         "retrieval_time_seconds": result.get("retrieval_time_seconds"),
         "expected_files": sorted(expected_files),
         "retrieved_files": retrieved_files,
         "expected_categories": sorted(expected_categories),
         "retrieved_categories": retrieved_categories,
-        "max_score": max(
-            [item.get("score", 0) for item in retrieved_results],
-            default=0,
-        ),
+        "max_score": max_score,
     }
 
 
@@ -224,25 +243,26 @@ def summarize_by_model(evaluations: List[Dict]) -> List[Dict]:
                 "model": model,
                 "provider": rows[0]["provider"],
                 "collection": rows[0]["collection"],
+                "eval_k": rows[0]["eval_k"],
                 "questions_evaluated": len(rows),
-                "avg_hit_at_5_file": round(
-                    sum(row["hit_at_5_file"] for row in rows) / len(rows),
+                "avg_hit_file": round(
+                    sum(row["hit_file"] for row in rows) / len(rows),
                     4,
                 ),
-                "avg_precision_at_5_file": round(
-                    sum(row["precision_at_5_file"] for row in rows) / len(rows),
+                "avg_precision_file": round(
+                    sum(row["precision_file"] for row in rows) / len(rows),
                     4,
                 ),
-                "avg_recall_at_5_file": round(
-                    sum(row["recall_at_5_file"] for row in rows) / len(rows),
+                "avg_recall_file": round(
+                    sum(row["recall_file"] for row in rows) / len(rows),
                     4,
                 ),
                 "avg_mrr_file": round(
                     sum(row["mrr_file"] for row in rows) / len(rows),
                     4,
                 ),
-                "avg_hit_at_5_category": round(
-                    sum(row["hit_at_5_category"] for row in rows) / len(rows),
+                "avg_hit_category": round(
+                    sum(row["hit_category"] for row in rows) / len(rows),
                     4,
                 ),
                 "avg_retrieval_time_seconds": round(
@@ -258,9 +278,9 @@ def summarize_by_model(evaluations: List[Dict]) -> List[Dict]:
 
     summary.sort(
         key=lambda item: (
-            item["avg_hit_at_5_file"],
+            item["avg_hit_file"],
             item["avg_mrr_file"],
-            item["avg_precision_at_5_file"],
+            item["avg_precision_file"],
         ),
         reverse=True,
     )
@@ -289,15 +309,17 @@ def print_summary(summary: List[Dict]) -> None:
     print("=" * 120)
 
     for index, row in enumerate(summary, start=1):
+        k = row["eval_k"]
+
         print(f"Rank #{index}")
         print(f"Model: {row['model']}")
         print(f"Provider: {row['provider']}")
         print(f"Questions evaluated: {row['questions_evaluated']}")
-        print(f"Hit@5 file: {row['avg_hit_at_5_file']}")
-        print(f"Precision@5 file: {row['avg_precision_at_5_file']}")
-        print(f"Recall@5 file: {row['avg_recall_at_5_file']}")
+        print(f"Hit@{k} file: {row['avg_hit_file']}")
+        print(f"Precision@{k} file: {row['avg_precision_file']}")
+        print(f"Recall@{k} file: {row['avg_recall_file']}")
         print(f"MRR file: {row['avg_mrr_file']}")
-        print(f"Hit@5 category: {row['avg_hit_at_5_category']}")
+        print(f"Hit@{k} category: {row['avg_hit_category']}")
         print(f"Avg retrieval time: {row['avg_retrieval_time_seconds']} sec")
         print("-" * 120)
 
@@ -321,6 +343,14 @@ def main() -> None:
     golden_data = load_json(GOLDEN_FILE)
     golden_index = build_golden_index(golden_data)
 
+    eval_k = get_eval_k(retrieval_results)
+
+    if eval_k == 0:
+        logger.error("No retrieval results found. Evaluation stopped.")
+        return
+
+    logger.info(f"Detected evaluation K: {eval_k}")
+
     evaluations = []
 
     for result in retrieval_results:
@@ -333,9 +363,14 @@ def main() -> None:
         evaluation = evaluate_single_result(
             result=result,
             golden_question=golden_index[question_id],
+            eval_k=eval_k,
         )
 
         evaluations.append(evaluation)
+
+    if not evaluations:
+        logger.error("No evaluations generated. Check question IDs.")
+        return
 
     summary = summarize_by_model(evaluations)
 

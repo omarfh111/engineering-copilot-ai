@@ -48,3 +48,7 @@ sentence-transformers
 openai
 requests
 pandas
+
+langchain 
+langchain-openai 
+langchain-core

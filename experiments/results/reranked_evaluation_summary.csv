@@ -1,0 +1,3 @@
+model,provider,collection,eval_k,questions_evaluated,avg_hit_file,avg_precision_file,avg_recall_file,avg_mrr_file,avg_hit_category,avg_retrieval_time_seconds
+text-embedding-3-small,openai,exp_openai_text_embedding_3_small,5,64,0.875,0.7063,0.849,0.8091,0.9375,0.8125
+sentence-transformers/all-MiniLM-L6-v2,sentence_transformers,exp_minilm_l6_v2,5,64,0.8594,0.6719,0.8359,0.7786,0.9219,4.9525

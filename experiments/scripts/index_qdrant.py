@@ -51,13 +51,13 @@ MAX_CHUNKS_TO_INDEX: Optional[int] = None
 
 
 MODELS_TO_INDEX = [
-    {
-        "provider": "ollama",
-        "name": "qwen3-embedding:8b",
-        "collection": "exp_qwen3_embedding_8b",
-        "dimension": 4096,
-        "document_prefix": "",
-    },
+    #{
+    #    "provider": "ollama",
+    #    "name": "qwen3-embedding:8b",
+    #    "collection": "exp_qwen3_embedding_8b",
+    #    "dimension": 4096,
+    #    "document_prefix": "",
+    #},
     {
         "provider": "openai",
         "name": "text-embedding-3-small",
@@ -72,20 +72,20 @@ MODELS_TO_INDEX = [
         "dimension": 384,
         "document_prefix": "",
     },
-    {
-        "provider": "sentence_transformers",
-        "name": "BAAI/bge-m3",
-        "collection": "exp_bge_m3",
-        "dimension": 1024,
-        "document_prefix": "",
-    },
-    {
-        "provider": "sentence_transformers",
-        "name": "nomic-ai/nomic-embed-text-v1.5",
-        "collection": "exp_nomic_embed_text_v15",
-        "dimension": 768,
-        "document_prefix": "search_document: ",
-    },
+    #{
+    #    "provider": "sentence_transformers",
+    #    "name": "BAAI/bge-m3",
+    #    "collection": "exp_bge_m3",
+    #    "dimension": 1024,
+    #    "document_prefix": "",
+    #},
+    #{
+    #    "provider": "sentence_transformers",
+    #    "name": "nomic-ai/nomic-embed-text-v1.5",
+    #    "collection": "exp_nomic_embed_text_v15",
+    #    "dimension": 768,
+    #    "document_prefix": "search_document: ",
+    #},
 ]
 
 
@@ -244,9 +244,11 @@ def build_points(
             "chunk_id": chunk["chunk_id"],
             "source_type": chunk["source_type"],
             "category": chunk["category"],
+            "source": chunk.get("source"),
             "filename": chunk["filename"],
             "file_path": chunk["file_path"],
             "extension": chunk["extension"],
+            "page_number": chunk.get("page_number"),
             "chunk_index": chunk["chunk_index"],
             "text": chunk["text"],
             "embedding_model": model_config["name"],

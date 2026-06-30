@@ -37,17 +37,22 @@ OUTPUT_FILE = OUTPUT_DIR / "chunks.jsonl"
 SUPPORTED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md", ".html", ".htm"}
 
 
-def extract_text_from_pdf(file_path: Path) -> str:
-    text_parts = []
+def extract_pages_from_pdf(file_path: Path) -> List[Dict]:
+    pages = []
 
     with fitz.open(file_path) as pdf:
-        for page in pdf:
-            text_parts.append(page.get_text())
+        for page_index, page in enumerate(pdf, start=1):
+            pages.append(
+                {
+                    "page_number": page_index,
+                    "text": page.get_text(),
+                }
+            )
 
-    return "\n".join(text_parts)
+    return pages
 
 
-def extract_text_from_docx(file_path: Path) -> str:
+def extract_pages_from_docx(file_path: Path) -> List[Dict]:
     document = DocxDocument(file_path)
 
     paragraphs = [
@@ -56,10 +61,15 @@ def extract_text_from_docx(file_path: Path) -> str:
         if paragraph.text.strip()
     ]
 
-    return "\n".join(paragraphs)
+    return [
+        {
+            "page_number": 1,
+            "text": "\n".join(paragraphs),
+        }
+    ]
 
 
-def extract_text_from_html(file_path: Path) -> str:
+def extract_pages_from_html(file_path: Path) -> List[Dict]:
     html_content = file_path.read_text(encoding="utf-8", errors="ignore")
 
     soup = BeautifulSoup(html_content, "html.parser")
@@ -67,30 +77,39 @@ def extract_text_from_html(file_path: Path) -> str:
     for tag in soup(["script", "style"]):
         tag.decompose()
 
-    return soup.get_text(separator="\n")
+    return [
+        {
+            "page_number": 1,
+            "text": soup.get_text(separator="\n"),
+        }
+    ]
 
 
-def extract_text_from_text_file(file_path: Path) -> str:
-    return file_path.read_text(encoding="utf-8", errors="ignore")
+def extract_pages_from_text_file(file_path: Path) -> List[Dict]:
+    return [
+        {
+            "page_number": 1,
+            "text": file_path.read_text(encoding="utf-8", errors="ignore"),
+        }
+    ]
 
 
-def extract_text(file_path: Path) -> str:
+def extract_pages(file_path: Path) -> List[Dict]:
     extension = file_path.suffix.lower()
 
     if extension == ".pdf":
-        return extract_text_from_pdf(file_path)
+        return extract_pages_from_pdf(file_path)
 
     if extension == ".docx":
-        return extract_text_from_docx(file_path)
+        return extract_pages_from_docx(file_path)
 
     if extension in {".txt", ".md"}:
-        return extract_text_from_text_file(file_path)
+        return extract_pages_from_text_file(file_path)
 
     if extension in {".html", ".htm"}:
-        return extract_text_from_html(file_path)
+        return extract_pages_from_html(file_path)
 
     raise ValueError(f"Unsupported file type: {extension}")
-
 
 def clean_text(text: str) -> str:
     lines = [line.strip() for line in text.splitlines()]
@@ -134,43 +153,54 @@ def get_category(file_path: Path) -> str:
 def build_chunk_records(file_path: Path) -> List[Dict]:
     logger.info(f"Processing document: {file_path}")
 
-    raw_text = extract_text(file_path)
-    cleaned_text = clean_text(raw_text)
-
-    if not cleaned_text:
-        logger.warning(f"Empty document skipped: {file_path}")
-        return []
-
-    chunks = chunk_text(
-        text=cleaned_text,
-        chunk_size=settings.CHUNK_SIZE,
-        chunk_overlap=settings.CHUNK_OVERLAP,
-    )
-
+    pages = extract_pages(file_path)
     category = get_category(file_path)
+
+    source = f"{category}/{file_path.name}"
 
     records = []
 
-    for index, chunk in enumerate(chunks):
-        records.append(
-            {
-                "chunk_id": f"{file_path.stem}_{index}",
-                "source_type": "enterprise_document",
-                "category": category,
-                "filename": file_path.name,
-                "file_path": str(file_path),
-                "extension": file_path.suffix.lower(),
-                "chunk_index": index,
-                "text": chunk,
-                "metadata": {
-                    "chunk_size": settings.CHUNK_SIZE,
-                    "chunk_overlap": settings.CHUNK_OVERLAP,
-                },
-            }
+    for page in pages:
+        page_number = page["page_number"]
+        raw_text = page["text"]
+
+        cleaned_text = clean_text(raw_text)
+
+        if not cleaned_text:
+            continue
+
+        chunks = chunk_text(
+            text=cleaned_text,
+            chunk_size=settings.CHUNK_SIZE,
+            chunk_overlap=settings.CHUNK_OVERLAP,
         )
 
-    return records
+        for index, chunk in enumerate(chunks):
+            records.append(
+                {
+                    "chunk_id": f"{file_path.stem}_p{page_number}_{index}",
+                    "source_type": "enterprise_document",
+                    "category": category,
+                    "source": source,
+                    "filename": file_path.name,
+                    "file_path": str(file_path),
+                    "extension": file_path.suffix.lower(),
+                    "page_number": page_number,
+                    "chunk_index": index,
+                    "text": chunk,
+                    "metadata": {
+                        "chunk_size": settings.CHUNK_SIZE,
+                        "chunk_overlap": settings.CHUNK_OVERLAP,
+                        "page_number": page_number,
+                        "source": source,
+                    },
+                }
+            )
 
+    if not records:
+        logger.warning(f"Empty document skipped: {file_path}")
+
+    return records
 
 def find_documents() -> List[Path]:
     documents = []

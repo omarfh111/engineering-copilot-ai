@@ -37,7 +37,7 @@ GOLDEN_FILE = (
     / "evaluation"
     / "rag_golden_eval_v1.json"
 )
-TOP_K = 5
+TOP_K = 10
 
 
 TEST_QUESTIONS = [
@@ -85,12 +85,12 @@ TEST_QUESTIONS = [
 
 
 MODELS_TO_TEST = [
-    {
-        "provider": "ollama",
-        "name": "qwen3-embedding:8b",
-        "collection": "exp_qwen3_embedding_8b",
-        "query_prefix": "",
-    },
+    #{
+    #    "provider": "ollama",
+    #    "name": "qwen3-embedding:8b",
+    #    "collection": "exp_qwen3_embedding_8b",
+    #    "query_prefix": "",
+    #},
     {
         "provider": "openai",
         "name": "text-embedding-3-small",
@@ -103,18 +103,18 @@ MODELS_TO_TEST = [
         "collection": "exp_minilm_l6_v2",
         "query_prefix": "",
     },
-    {
-        "provider": "sentence_transformers",
-        "name": "BAAI/bge-m3",
-        "collection": "exp_bge_m3",
-        "query_prefix": "",
-    },
-    {
-        "provider": "sentence_transformers",
-        "name": "nomic-ai/nomic-embed-text-v1.5",
-        "collection": "exp_nomic_embed_text_v15",
-        "query_prefix": "search_query: ",
-    },
+    #{
+    #    "provider": "sentence_transformers",
+    #    "name": "BAAI/bge-m3",
+    #    "collection": "exp_bge_m3",
+    #    "query_prefix": "",
+    #},
+    #{
+    #    "provider": "sentence_transformers",
+    #    "name": "nomic-ai/nomic-embed-text-v1.5",
+    #    "collection": "exp_nomic_embed_text_v15",
+    #    "query_prefix": "search_query: ",
+    #},
 ]
 
 
@@ -208,7 +208,9 @@ def search_qdrant(
             {
                 "score": result.score,
                 "category": payload.get("category"),
+                "source": payload.get("source"),
                 "filename": payload.get("filename"),
+                "page_number": payload.get("page_number"),
                 "chunk_id": payload.get("chunk_id"),
                 "chunk_index": payload.get("chunk_index"),
                 "text_preview": payload.get("text", "")[:500],
