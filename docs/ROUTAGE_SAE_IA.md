@@ -2,6 +2,8 @@
 
 Ce document est le contrat de handoff entre le backend **Spring Boot SAE** et le microservice **FastAPI IA** pendant le Sprint 2. Il décrit uniquement les routes réellement montées par `app/main.py`.
 
+Documents complémentaires : [README principal](../README.md), [guide de la codebase](GUIDE_CODEBASE.md) et [expérimentations/évaluations](EXPERIMENTATIONS_ET_EVALUATIONS.md).
+
 ## 1. Frontière entre les services
 
 Spring Boot reste le point d'entrée public. Il gère l'utilisateur, l'authentification, les rôles, les projets, les repositories, les documents métier et PostgreSQL. FastAPI reçoit une demande technique déjà autorisée et exécute le traitement IA.

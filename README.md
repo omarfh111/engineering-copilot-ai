@@ -94,6 +94,103 @@ Les fichiers correspondants existent parfois comme squelettes vides. Ils ne cons
 
 Sur les 64 questions du jeu d'évaluation, OpenAI a obtenu un MRR de `0.7942` avant reranking et `0.8091` après reranking. Les résultats complets sont dans [experiments/results/comparison_report.md](experiments/results/comparison_report.md).
 
+## Travaux réalisés et évaluations
+
+### Préparation du corpus
+
+| Étape | Entrée | Résultat |
+| --- | ---: | ---: |
+| collecte documentaire | 19 documents, environ 2967 pages | 4 catégories métier |
+| première itération de chunking | 19 documents | 5604 chunks |
+| premier nettoyage | 5604 chunks | 4831 conservés, environ 773 supprimés |
+| re-chunking page par page | 19 documents | 7156 chunks dans l'artefact actuel |
+| nettoyage page-aware | 7156 chunks | 5821 conservés dans l'artefact actuel |
+| ajout des métadonnées | chunks par page | `source`, `page_number`, `chunk_id` et catégorie |
+| échantillonnage équilibré | 5821 chunks | 800 chunks, 200 par catégorie |
+| golden dataset | 19 documents | 64 questions annotées |
+
+Le golden dataset contient 28 questions factuelles, 16 questions cross-document, 10 questions multi-hop et 10 questions négatives.
+
+Les valeurs `5604/4831` décrivent la première campagne rapportée. Les fichiers JSONL versionnés ont ensuite été régénérés page par page et contiennent actuellement `7156/5821` enregistrements.
+
+### Benchmark des embeddings sur 80 chunks
+
+| Modèle | Provider | Dimension | Temps total | Temps/chunk |
+| --- | --- | ---: | ---: | ---: |
+| `qwen3-embedding:8b` | Ollama | 4096 | 50.534 s | 0.6317 s |
+| `text-embedding-3-small` | OpenAI | 1536 | 5.897 s | 0.0737 s |
+| `all-MiniLM-L6-v2` | SentenceTransformers | 384 | 1.863 s | 0.0233 s |
+| `BAAI/bge-m3` | SentenceTransformers | 1024 | 46.950 s | 0.5869 s |
+| `nomic-embed-text-v1.5` | SentenceTransformers | 768 | 18.786 s | 0.2348 s |
+
+MiniLM est le plus rapide et le plus léger. OpenAI a été retenu comme modèle principal grâce à son compromis entre qualité de retrieval, temps et simplicité d'intégration. MiniLM reste l'alternative locale.
+
+### Retrieval sur 200 chunks - Top 5
+
+| Modèle | Hit@5 fichier | Precision@5 | Recall@5 | MRR | Temps moyen |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Qwen3 | 0.8438 | 0.6281 | 0.7995 | 0.7628 | 2.6794 s |
+| OpenAI | 0.8438 | 0.6344 | 0.8177 | 0.7526 | 1.2317 s |
+| MiniLM | 0.8281 | 0.5906 | 0.7734 | 0.7492 | 3.3290 s |
+| BGE-M3 | 0.7812 | 0.5500 | 0.7292 | 0.6943 | 6.2663 s |
+| Nomic | 0.6719 | 0.4344 | 0.6016 | 0.5547 | 6.3285 s |
+
+### Retrieval sur 800 chunks - Top 5
+
+| Modèle | Hit@5 fichier | Precision@5 | Recall@5 | MRR | Temps moyen |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| OpenAI | 0.9219 | 0.7562 | 0.9036 | 0.8385 | 1.1670 s |
+| MiniLM | 0.8906 | 0.7000 | 0.8750 | 0.8203 | 3.3034 s |
+| Qwen3 | 0.8906 | 0.7219 | 0.8724 | 0.8065 | 2.6933 s |
+| BGE-M3 | 0.8125 | 0.6531 | 0.7969 | 0.7708 | 6.1310 s |
+| Nomic | 0.7188 | 0.5625 | 0.6849 | 0.6523 | 6.4037 s |
+
+### Évaluation finale après chunking par page
+
+Le passage à un chunking page par page a modifié les résultats, mais permet désormais des citations fiables.
+
+| Configuration | Hit fichier | Précision | Recall | MRR | Hit catégorie | Temps moyen |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| OpenAI Top 10 | 0.8906 | 0.6703 | 0.8724 | 0.7942 | 0.9688 | 0.8125 s |
+| MiniLM Top 10 | 0.9062 | 0.6281 | 0.8880 | 0.7465 | 0.9531 | 4.9525 s |
+| OpenAI + CrossEncoder Top 5 | 0.8750 | 0.7063 | 0.8490 | 0.8091 | 0.9375 | 0.8125 s |
+| MiniLM + CrossEncoder Top 5 | 0.8594 | 0.6719 | 0.8359 | 0.7786 | 0.9219 | 4.9525 s |
+
+Le reranking améliore la précision et le classement des premières réponses : pour OpenAI, la précision passe de `0.6703` à `0.7063` et le MRR de `0.7942` à `0.8091`.
+
+### Indexation Qdrant finale
+
+| Collection | Modèle | Dimension | Points | Temps total | Statut |
+| --- | --- | ---: | ---: | ---: | --- |
+| `exp_openai_text_embedding_3_small` | OpenAI | 1536 | 800 | 58.371 s | succès |
+| `exp_minilm_l6_v2` | MiniLM | 384 | 800 | 50.875 s | succès |
+
+### Tests applicatifs réalisés
+
+| Composant | Vérification |
+| --- | --- |
+| configuration | chargement Pydantic de `.env` |
+| PostgreSQL | création de l'engine et de la session SQLAlchemy |
+| embeddings | dimensions OpenAI 1536 et MiniLM 384 |
+| Qdrant | création de collection, upsert, recherche, compteur de points |
+| CrossEncoder | Top 10 retrieval vers Top 5 reranké |
+| LLM reranker | sélection Top 5 par `gpt-4o-mini` |
+| RAG SDK | réponse finale et sources avec OpenAI SDK |
+| RAG LangChain | chaîne, réponse française, sources et modes de reranking |
+| LangSmith | traces des étapes retrieval, contexte et génération |
+| FastAPI | OpenAPI, santé, validation et quatre routes RAG |
+
+La méthodologie complète, les commandes, les métriques et les limites sont documentées dans [docs/EXPERIMENTATIONS_ET_EVALUATIONS.md](docs/EXPERIMENTATIONS_ET_EVALUATIONS.md).
+
+## Documentation du projet
+
+| Document | Contenu |
+| --- | --- |
+| [Guide de la codebase](docs/GUIDE_CODEBASE.md) | rôle de chaque fichier, statut, flux d'exécution et dépendances |
+| [Expérimentations et évaluations](docs/EXPERIMENTATIONS_ET_EVALUATIONS.md) | corpus, benchmarks, métriques, tests, résultats et reproduction |
+| [Routage SAE / IA](docs/ROUTAGE_SAE_IA.md) | endpoints, DTO Spring Boot, erreurs, sécurité et handoff |
+| [Rapport comparatif généré](experiments/results/comparison_report.md) | synthèse automatique des résultats enregistrés |
+
 ## Démarrage local
 
 ### Prérequis
@@ -206,6 +303,8 @@ experiments/
 
 tests/                             # Tests historiques, plusieurs sont intégrés aux clouds
 docs/ROUTAGE_SAE_IA.md             # Handoff pour la partie SAE
+docs/GUIDE_CODEBASE.md              # Inventaire et explication des fichiers
+docs/EXPERIMENTATIONS_ET_EVALUATIONS.md # Protocole et résultats IA
 ```
 
 ## Tests et vérifications
