@@ -6,16 +6,18 @@ import org.example.copilote.entity.AnalysisType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
+public interface AnalysisRepository extends JpaRepository<Analysis, Long>, JpaSpecificationExecutor<Analysis> {
+
+    // Spring Boot needs the explicit path traversal path to find the nested project ID property
+    List<Analysis> findByProjectProjectId(Long projectId);
 
     List<Analysis> findByStatus(AnalysisStatus status);
-
-    List<Analysis> findByType(AnalysisType type);
 
     Page<Analysis> findByStatus(AnalysisStatus status, Pageable pageable);
 
@@ -23,4 +25,6 @@ public interface AnalysisRepository extends JpaRepository<Analysis, Long> {
 
     Page<Analysis> findByStatusAndType(AnalysisStatus status, AnalysisType type, Pageable pageable);
 
+    // This stays clean to pull the recent audit logs onto your main tracking panel
+    List<Analysis> findTop5ByOrderByCreatedAtDesc();
 }

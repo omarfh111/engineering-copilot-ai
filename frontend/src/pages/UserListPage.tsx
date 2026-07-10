@@ -14,9 +14,10 @@ import { useSession } from '../context/SessionContext';
 import { useToast } from '../context/ToastContext';
 import { useDebounce } from '../hooks/useDebounce';
 import { getApiErrorMessage, userApi } from '../lib/api';
+import { adminUserService } from '../services/adminUserService';
 import type { PagedResponse, Role, UpdateUserPayload, User } from '../types/user';
 
-const roleOptions: Array<Role | ''> = ['', 'ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER'];
+const roleOptions: Array<Role | ''> = ['', 'ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'];
 
 export function UserListPage() {
   const navigate = useNavigate();
@@ -100,7 +101,7 @@ export function UserListPage() {
     setSubmitting(true);
 
     try {
-      await userApi.updateUser(selectedUser.id, payload);
+      await adminUserService.updateUser(selectedUser.id, payload);
       showToast({
         type: 'success',
         title: 'User updated',

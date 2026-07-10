@@ -5,5 +5,7 @@ public enum DocumentType {
     DOCX,
     HTML,
     MD,
-    WIKI
+    WIKI,
+    TXT,
+    OTHER
 }

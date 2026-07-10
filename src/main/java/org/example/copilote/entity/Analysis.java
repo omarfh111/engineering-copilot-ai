@@ -28,8 +28,18 @@ public class Analysis {
     @Column(nullable = false)
     private AnalysisStatus status;
 
+    @Column(length = 200)
+    private String title;
+
     @Column(columnDefinition = "TEXT")
     private String summary;
+
+    @Column(columnDefinition = "TEXT")
+    private String recommendation;
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private Severity severity;
 
     @Column
     private Double score;
@@ -56,6 +66,10 @@ public class Analysis {
 
         if (status == null) {
             status = AnalysisStatus.PENDING;
+        }
+
+        if (severity == null) {
+            severity = Severity.MEDIUM;
         }
     }
 

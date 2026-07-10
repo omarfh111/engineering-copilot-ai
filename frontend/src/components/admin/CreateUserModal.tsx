@@ -12,7 +12,7 @@ interface CreateUserModalProps {
   onSubmit: (payload: CreateAdminUserPayload) => void;
 }
 
-const roles: Role[] = ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER'];
+const roles: Role[] = ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'];
 
 const defaultValues: CreateAdminUserPayload = {
   firstName: '',
@@ -26,6 +26,7 @@ const defaultValues: CreateAdminUserPayload = {
 export function CreateUserModal({ open, loading, onClose, onSubmit }: CreateUserModalProps) {
   const [teams, setTeams] = useState<TeamOption[]>([]);
   const [loadingTeams, setLoadingTeams] = useState(false);
+  const [teamLoadError, setTeamLoadError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -39,14 +40,20 @@ export function CreateUserModal({ open, loading, onClose, onSubmit }: CreateUser
     if (!open) {
       reset(defaultValues);
       setTeams([]);
+      setTeamLoadError(null);
       return;
     }
 
     setLoadingTeams(true);
+    setTeamLoadError(null);
 
     void adminUserService
       .getTeamOptions()
       .then((options) => setTeams(options))
+      .catch(() => {
+        setTeams([]);
+        setTeamLoadError('Teams could not be loaded.');
+      })
       .finally(() => setLoadingTeams(false));
   }, [open, reset]);
 
@@ -158,7 +165,7 @@ export function CreateUserModal({ open, loading, onClose, onSubmit }: CreateUser
               <span className="text-sm font-medium text-slate-200">Team</span>
               <select
                 className="w-full rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10"
-                disabled={loadingTeams}
+                disabled={loadingTeams || Boolean(teamLoadError)}
                 {...register('teamId')}
               >
                 <option value="">{loadingTeams ? 'Loading teams...' : 'No team assigned'}</option>
@@ -168,6 +175,7 @@ export function CreateUserModal({ open, loading, onClose, onSubmit }: CreateUser
                   </option>
                 ))}
               </select>
+              {teamLoadError ? <p className="text-sm text-rose-300">{teamLoadError}</p> : null}
             </label>
           </div>
 

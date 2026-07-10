@@ -2,16 +2,26 @@ package org.example.copilote.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.copilote.dto.Request.PageQueryRequest;
-import org.example.copilote.dto.Response.DocumentSummaryResponse;
+import org.example.copilote.dto.Request.CreateDocumentRequest;
+import org.example.copilote.dto.Request.DocumentSearchRequest;
+import org.example.copilote.dto.Request.UpdateDocumentRequest;
+import org.example.copilote.dto.Response.DocumentResponse;
 import org.example.copilote.dto.Response.PagedResponse;
-import org.example.copilote.service.WorkspaceReadService;
+import org.example.copilote.service.DocumentService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -19,10 +29,41 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin(origins = "*")
 public class DocumentController {
 
-    private final WorkspaceReadService workspaceReadService;
+    private final DocumentService documentService;
 
     @GetMapping
-    public ResponseEntity<PagedResponse<DocumentSummaryResponse>> getDocuments(@Valid @ModelAttribute PageQueryRequest request) {
-        return ResponseEntity.ok(workspaceReadService.getDocuments(request));
+    public ResponseEntity<PagedResponse<DocumentResponse>> getDocuments(
+            @Valid @ModelAttribute DocumentSearchRequest request
+    ) {
+        return ResponseEntity.ok(documentService.getAllDocuments(request));
+    }
+
+    @PostMapping
+    public ResponseEntity<DocumentResponse> createDocument(@Valid @RequestBody CreateDocumentRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(documentService.createDocument(request));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DocumentResponse> getDocumentById(@PathVariable Long id) {
+        return ResponseEntity.ok(documentService.getDocumentById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DocumentResponse> updateDocument(
+            @PathVariable Long id,
+            @Valid @RequestBody UpdateDocumentRequest request
+    ) {
+        return ResponseEntity.ok(documentService.updateDocument(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteDocument(@PathVariable Long id) {
+        documentService.deleteDocument(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<DocumentResponse>> getDocumentsByProjectId(@PathVariable Long projectId) {
+        return ResponseEntity.ok(documentService.getDocumentsByProjectId(projectId));
     }
 }

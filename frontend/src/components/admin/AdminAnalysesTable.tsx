@@ -40,7 +40,7 @@ export function AdminAnalysesTable({ analyses }: AdminAnalysesTableProps) {
   if (analyses.length === 0) {
     return (
       <EmptyState
-        description="Recent AI analysis activity will appear here as repository scans and reviews complete."
+        description="Recent analysis activity will appear here as repository scans and reviews complete."
         title="No recent analyses"
       />
     );

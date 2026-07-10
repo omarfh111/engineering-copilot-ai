@@ -169,7 +169,7 @@ export function RoleDashboardPage() {
             <div className="flex items-center gap-3 text-brand-600 dark:text-brand-300">
               <Bot className="h-5 w-5" />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em]">AI Recommendations</p>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em]">Recommendations</p>
                 <h2 className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">Recommended next actions</h2>
               </div>
             </div>

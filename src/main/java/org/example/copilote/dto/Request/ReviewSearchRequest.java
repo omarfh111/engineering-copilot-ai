@@ -8,5 +8,11 @@ import org.example.copilote.entity.ReviewStatus;
 @Setter
 public class ReviewSearchRequest extends PageQueryRequest {
 
+    private String search;
+
     private ReviewStatus status;
+
+    private Long analysisId;
+
+    private Long projectId;
 }

@@ -1,5 +1,5 @@
-export type Role = 'ADMIN' | 'MANAGER' | 'ARCHITECT' | 'QA' | 'DEVELOPER';
-export type ApiRole = Role | 'AUDITOR';
+export type Role = 'ADMIN' | 'MANAGER' | 'ARCHITECT' | 'QA' | 'DEVELOPER' | 'AUDITOR';
+export type ApiRole = Role;
 
 export interface TeamSummary {
   id: number;
@@ -51,4 +51,5 @@ export interface UpdateUserPayload {
   role?: Role;
   enabled?: boolean;
   accountLocked?: boolean;
+  teamId?: number | string;
 }

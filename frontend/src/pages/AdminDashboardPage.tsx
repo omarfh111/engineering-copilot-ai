@@ -143,10 +143,10 @@ export function AdminDashboardPage() {
           <div>
             <p className="text-sm font-medium text-brand-100">Welcome back, Administrator 👋</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-              Manage your engineering workspace and monitor AI activities.
+              Manage your engineering workspace and monitor operational activity.
             </h1>
             <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
-              Oversee platform users, project telemetry, AI analyses, and operational activity from one command center.
+              Oversee platform users, project telemetry, analyses, and operational activity from one command center.
             </p>
           </div>
 
@@ -177,7 +177,7 @@ export function AdminDashboardPage() {
             <AdminMetricCard icon={FolderKanban} label="Projects" metric={overview.stats.projects} />
             <AdminMetricCard icon={GitBranch} label="Repositories" metric={overview.stats.repositories} />
             <AdminMetricCard icon={BookText} label="Documents" metric={overview.stats.documents} />
-            <AdminMetricCard icon={BrainCircuit} label="AI Analyses" metric={overview.stats.analyses} />
+            <AdminMetricCard icon={BrainCircuit} label="Analyses" metric={overview.stats.analyses} />
             <AdminMetricCard icon={MessagesSquare} label="Pending Reviews" metric={overview.stats.pendingReviews} />
             <AdminMetricCard icon={SquareCheckBig} label="Open Todos" metric={overview.stats.openTodos} />
           </section>
@@ -232,8 +232,8 @@ export function AdminDashboardPage() {
 
             <div className="space-y-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">AI Operations</p>
-                <h2 className="mt-2 text-2xl font-semibold text-slate-100">Recent AI Analyses</h2>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">Analysis operations</p>
+                <h2 className="mt-2 text-2xl font-semibold text-slate-100">Recent Analyses</h2>
               </div>
               <AdminAnalysesTable analyses={overview.recentAnalyses} />
             </div>

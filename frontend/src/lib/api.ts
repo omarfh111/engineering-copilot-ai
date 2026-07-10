@@ -30,6 +30,22 @@ export const apiClient = axios.create({
   }
 });
 
+export function resolveFileUrl(path: string | null | undefined) {
+  if (!path) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  if (path.startsWith('/')) {
+    return `${API_BASE_URL}${path}`;
+  }
+
+  return `${API_BASE_URL}/${path}`;
+}
+
 apiClient.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_STORAGE_KEY);
 
@@ -47,7 +63,7 @@ function removeEmptyValues(params: UserQueryParams) {
 }
 
 function normalizeRole(role: ApiRole) {
-  return role === 'AUDITOR' ? 'MANAGER' : role;
+  return role;
 }
 
 function normalizeTeamSummary(team: ApiTeamSummary) {
@@ -73,9 +89,35 @@ function normalizeUserPage(page: PagedResponse<User | ApiUser>) {
   } as PagedResponse<User>;
 }
 
+type ApiErrorBody = {
+  error?: string;
+  message?: string;
+  status?: number;
+};
+
+const fallbackStatusMessages: Record<number, string> = {
+  400: 'Check the highlighted fields and try again.',
+  401: 'Your session has expired. Sign in again to continue.',
+  403: 'You do not have permission to perform this action.',
+  404: 'The requested record could not be found.',
+  409: 'This record conflicts with existing data.',
+  500: 'The server could not complete the request. Try again later.'
+};
+
 export function getApiErrorMessage(error: unknown) {
-  if (axios.isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data?.message ?? error.message;
+  if (axios.isAxiosError<ApiErrorBody>(error)) {
+    const status = error.response?.status;
+    const message = error.response?.data?.message;
+
+    if (message) {
+      return message;
+    }
+
+    if (status && fallbackStatusMessages[status]) {
+      return fallbackStatusMessages[status];
+    }
+
+    return error.message;
   }
 
   if (error instanceof Error) {

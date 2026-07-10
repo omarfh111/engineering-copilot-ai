@@ -22,7 +22,7 @@ export function RecommendationsPanel({ recommendations }: RecommendationsPanelPr
   if (recommendations.length === 0) {
     return (
       <EmptyState
-        description="AI recommendations will appear here when your overview endpoint begins surfacing actionable insights."
+        description="Recommendations will appear here when your overview endpoint begins surfacing actionable insights."
         title="No recommendations yet"
       />
     );

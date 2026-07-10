@@ -206,6 +206,7 @@ public class WorkspaceReadService {
                 .id(project.getProjectId())
                 .projectId(project.getProjectId())
                 .title(project.getTitle())
+                .description(project.getDescription())
                 .status(project.getStatus().name())
                 .teamName(project.getTeam() != null ? project.getTeam().getTeamName() : null)
                 .repositoryCount(safeSize(project.getRepositories()))

@@ -2,6 +2,7 @@ package org.example.copilote.dto.Response;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.example.copilote.entity.RepositoryProvider;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +20,7 @@ public class RepositorySummaryResponse {
 
     private final String technology;
 
-    private final String provider;
+    private final RepositoryProvider provider;
 
     private final String branch;
 

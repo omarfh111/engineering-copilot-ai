@@ -9,10 +9,6 @@ public enum Role {
     AUDITOR;
 
     public Role normalized() {
-        if (this == AUDITOR) {
-            return MANAGER;
-        }
-
         return this;
     }
 }

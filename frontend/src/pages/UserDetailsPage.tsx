@@ -10,6 +10,7 @@ import { useSession } from '../context/SessionContext';
 import { useToast } from '../context/ToastContext';
 import { getApiErrorMessage, userApi } from '../lib/api';
 import { formatDate, formatRole } from '../lib/formatters';
+import { adminUserService } from '../services/adminUserService';
 import type { UpdateUserPayload, User } from '../types/user';
 
 function resolveStatus(user: User) {
@@ -73,7 +74,10 @@ export function UserDetailsPage() {
     setSubmitting(true);
 
     try {
-      const updatedUser = await userApi.updateUser(user.id, payload);
+      const updatedUser =
+        currentUser?.role === 'ADMIN'
+          ? await adminUserService.updateUser(user.id, payload)
+          : await userApi.updateUser(user.id, payload);
       setUser(updatedUser);
       setModalOpen(false);
       showToast({

@@ -53,7 +53,7 @@ export function SystemActivityTimeline({ items }: SystemActivityTimelineProps) {
   if (items.length === 0) {
     return (
       <EmptyState
-        description="System events will be listed here as users, repositories, documents, and AI tasks are created."
+        description="System events will be listed here as users, repositories, documents, and analysis tasks are created."
         title="No activity events"
       />
     );

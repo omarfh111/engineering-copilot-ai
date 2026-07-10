@@ -3,6 +3,7 @@ import {
   Bot,
   Boxes,
   ClipboardCheck,
+  MessageSquareText,
   FileText,
   FolderKanban,
   GitBranch,
@@ -31,6 +32,7 @@ export type WorkspaceModuleId =
   | 'analyses'
   | 'reviews'
   | 'todos'
+  | 'conversations'
   | 'settings'
   | 'audit'
   | 'system-health'
@@ -102,10 +104,18 @@ export const roleDefinitions: Record<Role, WorkspaceRoleDefinition> = {
   DEVELOPER: {
     label: 'Developer',
     workspaceName: 'Builder Workspace',
-    dashboardHeadline: 'Execution, documentation, and AI-assisted delivery.',
+    dashboardHeadline: 'Execution, documentation, and delivery follow-through.',
     dashboardDescription:
-      'Focus on active projects, repository context, documentation, AI guidance, and personal TODO execution.',
-    accessSummary: 'Hands-on engineering workspace with AI support and personal execution focus.'
+      'Focus on active projects, repository context, documentation, and personal TODO execution.',
+    accessSummary: 'Hands-on engineering workspace with personal execution focus.'
+  },
+  AUDITOR: {
+    label: 'Auditor',
+    workspaceName: 'Audit Review',
+    dashboardHeadline: 'Read-only review of documents, documentation, analyses, and review decisions.',
+    dashboardDescription:
+      'Inspect evidence, analysis outcomes, documentation records, and QA review history without changing platform data.',
+    accessSummary: 'Read-only governance visibility for evidence and quality review artifacts.'
   }
 };
 
@@ -115,7 +125,7 @@ export const workspaceModules: Record<WorkspaceModuleId, WorkspaceModuleDefiniti
     label: 'Dashboard',
     path: '/dashboard',
     icon: LayoutDashboard,
-    allowedRoles: ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER'],
+    allowedRoles: ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'],
     kicker: 'Operations center',
     headline: 'Role-specific command center',
     description: 'Monitor the engineering signals, risks, and delivery metrics that matter to your responsibility.',
@@ -155,10 +165,10 @@ export const workspaceModules: Record<WorkspaceModuleId, WorkspaceModuleDefiniti
     label: 'Projects',
     path: '/dashboard/projects',
     icon: FolderKanban,
-    allowedRoles: ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER'],
+    allowedRoles: ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'],
     kicker: 'Delivery portfolio',
     headline: 'Track delivery initiatives',
-    description: 'Keep projects aligned across delivery, repository intelligence, quality gates, and AI analysis activity.',
+    description: 'Keep projects aligned across delivery, repository inventory, quality gates, and analysis activity.',
     capabilities: {
       ADMIN: ['Monitor every project', 'Audit project activity across teams'],
       MANAGER: ['Create projects', 'Assign repositories and people', 'Approve milestones', 'Monitor progress'],
@@ -174,77 +184,102 @@ export const workspaceModules: Record<WorkspaceModuleId, WorkspaceModuleDefiniti
     path: '/dashboard/repositories',
     icon: GitBranch,
     allowedRoles: ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER'],
-    kicker: 'Source control intelligence',
-    headline: 'Observe connected repositories',
-    description: 'Inspect repository inventory, technology footprints, providers, and AI-analysis readiness.',
+    kicker: 'Source control inventory',
+    headline: 'Manage linked repositories',
+    description: 'Track repository metadata, providers, default branches, and project ownership during Sprint 2 CRUD delivery.',
     capabilities: {
-      ADMIN: ['Manage repository inventory', 'Review repository health across the platform'],
-      MANAGER: ['Assign repositories to projects', 'Track repository coverage for delivery'],
-      ARCHITECT: ['Analyze repository structure', 'Inspect dependencies and architecture signals'],
-      QA: ['Review repository quality and security context'],
-      DEVELOPER: ['Work with repository context', 'Launch analyses and AI assistance from code context']
+      ADMIN: ['Create repositories', 'Edit repository metadata', 'Delete repository links', 'Review platform inventory'],
+      MANAGER: ['View repository assignments', 'Track repository coverage for delivery'],
+      ARCHITECT: ['Review repository inventory', 'Inspect provider and technology metadata'],
+      QA: ['View repository inventory linked to accessible projects'],
+      DEVELOPER: ['View repository inventory linked to accessible projects']
     },
-    boundaries: ['Repository governance differs by role even when inventory visibility is shared.']
+    boundaries: ['Repository work is metadata CRUD only and does not include provider sync or cloning.']
   },
   documents: {
     id: 'documents',
     label: 'Documents',
     path: '/dashboard/documents',
     icon: FileText,
-    allowedRoles: ['ADMIN'],
-    kicker: 'Knowledge operations',
-    headline: 'Audit ingested documentation',
-    description: 'Review uploaded documentation assets, source coverage, and knowledge ingestion quality across the platform.',
+    allowedRoles: ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'],
+    kicker: 'Reference inventory',
+    headline: 'Manage linked source documents',
+    description: 'Track standards, internal norms, architecture references, and technical guidance as project-linked metadata during Sprint 2 CRUD delivery.',
     capabilities: {
-      ADMIN: ['View enterprise documentation inventory', 'Validate documentation ingestion readiness']
+      ADMIN: ['Create documents', 'Edit document metadata', 'Delete document links', 'Review platform inventory'],
+      MANAGER: ['View documents linked to accessible projects', 'Track reference coverage for delivery'],
+      ARCHITECT: ['Review architecture and standards references linked to projects'],
+      QA: ['View security and quality reference documents linked to accessible projects'],
+      DEVELOPER: ['View source documents linked to accessible projects']
     },
-    boundaries: ['This administration-facing document inventory is distinct from role workspaces focused on technical documentation use.']
+    boundaries: ['Document work is metadata CRUD with preview and download links when files are served by the backend.']
   },
   analyses: {
     id: 'analyses',
     label: 'Analyses',
     path: '/dashboard/analyses',
     icon: Boxes,
-    allowedRoles: ['ADMIN'],
-    kicker: 'AI execution center',
+    allowedRoles: ['ADMIN', 'MANAGER', 'QA', 'AUDITOR'],
+    kicker: 'Analysis center',
     headline: 'Audit analysis operations',
     description: 'Track analysis volume, outcomes, and enterprise-wide scan history for governance purposes.',
     capabilities: {
-      ADMIN: ['View every analysis', 'Inspect operational scan history', 'Track platform-wide AI activity']
+      ADMIN: ['View every analysis', 'Inspect operational scan history', 'Track platform-wide activity'],
+      MANAGER: ['View analyses linked to managed delivery work', 'Track project risk signals'],
+      QA: ['Create analyses', 'Update analysis outcomes', 'Track quality and security findings'],
+      AUDITOR: ['Read analysis evidence', 'Inspect status and severity history']
     },
-    boundaries: ['Analysis governance is admin-only here; delivery roles see analysis outcomes through their own workspaces.']
+    boundaries: ['Auditors can read analyses but cannot create, edit, or delete them.']
   },
   reviews: {
     id: 'reviews',
     label: 'Reviews',
     path: '/dashboard/reviews',
     icon: ClipboardCheck,
-    allowedRoles: ['ADMIN', 'MANAGER', 'QA'],
+    allowedRoles: ['ADMIN', 'MANAGER', 'QA', 'AUDITOR'],
     kicker: 'Decision workflows',
     headline: 'Track review decisions',
     description: 'Follow approval flow, pending reviews, and release-quality checkpoints across engineering work.',
     capabilities: {
       ADMIN: ['View every review', 'Audit approval history'],
       MANAGER: ['Monitor review progress', 'Support milestone approvals'],
-      QA: ['Review code', 'Approve QA checks', 'Validate release readiness']
+      QA: ['Review code', 'Approve QA checks', 'Validate release readiness'],
+      AUDITOR: ['Read review decisions', 'Inspect QA evidence without editing']
     },
-    boundaries: ['Review approval remains outside the developer workspace and outside architectural governance modules.']
+    boundaries: ['Auditors can read reviews but cannot create, edit, or delete review decisions.']
   },
   todos: {
     id: 'todos',
     label: 'Todos',
     path: '/dashboard/todos',
     icon: SquareCheckBig,
-    allowedRoles: ['ADMIN', 'MANAGER', 'QA'],
+    allowedRoles: ['ADMIN', 'MANAGER', 'QA', 'DEVELOPER'],
     kicker: 'Execution backlog',
     headline: 'Manage operational TODO flow',
     description: 'Observe remediation queues, QA work items, and enterprise follow-ups produced by analyses and reviews.',
     capabilities: {
       ADMIN: ['View every TODO', 'Audit remediation backlog platform-wide'],
       MANAGER: ['Assign TODOs', 'Change priorities', 'Monitor completion risk'],
-      QA: ['Manage QA TODOs', 'Validate defect remediation flow']
+      QA: ['Manage QA TODOs', 'Validate defect remediation flow'],
+      DEVELOPER: ['Update assigned project TODO status', 'Track active remediation work']
     },
-    boundaries: ['Developers receive a personal TODO workspace instead of the enterprise backlog view.']
+    boundaries: ['Auditors do not receive TODO access. Developers can work TODOs visible through assigned project membership.']
+  },
+  conversations: {
+    id: 'conversations',
+    label: 'Conversations',
+    path: '/dashboard/conversations',
+    icon: MessageSquareText,
+    allowedRoles: ['ADMIN', 'MANAGER', 'DEVELOPER'],
+    kicker: 'Assistant history',
+    headline: 'Review project conversations',
+    description: 'Inspect project-linked questions, answers, confidence scores, and response latency.',
+    capabilities: {
+      ADMIN: ['View every conversation', 'Edit or remove exchange records'],
+      MANAGER: ['Read project conversation history', 'Track support activity'],
+      DEVELOPER: ['Create conversations', 'Edit own exchanges', 'Review project context']
+    },
+    boundaries: ['Conversation writes are limited to administrators and developers.']
   },
   settings: {
     id: 'settings',
@@ -349,15 +384,19 @@ export const workspaceModules: Record<WorkspaceModuleId, WorkspaceModuleDefiniti
     label: 'Documentation',
     path: '/dashboard/documentation',
     icon: FileText,
-    allowedRoles: ['ARCHITECT', 'DEVELOPER'],
-    kicker: 'Technical knowledge',
-    headline: 'Use project documentation',
-    description: 'Review architecture notes, ADRs, generated documents, and project knowledge needed for engineering work.',
+    allowedRoles: ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'],
+    kicker: 'Delivery knowledge',
+    headline: 'Manage documentation deliverables',
+    description: 'Track README files, API guides, architecture notes, onboarding assets, and technical reports linked to projects.',
     capabilities: {
-      ARCHITECT: ['Generate architecture documentation', 'Review documentation coverage'],
-      DEVELOPER: ['Read project documentation', 'Generate documentation with AI support']
+      ADMIN: ['Create documentation', 'Edit every documentation record', 'Delete documentation deliverables', 'Review platform coverage'],
+      MANAGER: ['View documentation linked to accessible projects', 'Track delivery knowledge coverage'],
+      ARCHITECT: ['Create documentation deliverables', 'Edit accessible project documentation', 'Maintain architecture knowledge'],
+      QA: ['Review documentation readiness linked to accessible projects'],
+      DEVELOPER: ['Read project documentation deliverables'],
+      AUDITOR: ['Read documentation deliverables', 'Inspect evidence without editing']
     },
-    boundaries: ['Documentation access here supports engineering execution rather than platform administration.']
+    boundaries: ['This module is CRUD only for now and does not implement generated content or indexing workflows.']
   },
   impact: {
     id: 'impact',
@@ -403,15 +442,15 @@ export const workspaceModules: Record<WorkspaceModuleId, WorkspaceModuleDefiniti
   },
   assistant: {
     id: 'assistant',
-    label: 'AI Assistant',
+    label: 'Assistant',
     path: '/dashboard/assistant',
     icon: Bot,
     allowedRoles: ['DEVELOPER'],
-    kicker: 'AI support',
-    headline: 'Work with the AI assistant',
-    description: 'Use AI guidance for repository questions, implementation context, and documentation generation support.',
+    kicker: 'Developer support',
+    headline: 'Work with project support',
+    description: 'Use saved project context for repository questions, implementation notes, and documentation support.',
     capabilities: {
-      DEVELOPER: ['Ask AI questions', 'Generate documentation', 'Review engineering recommendations']
+      DEVELOPER: ['Ask project questions', 'Draft documentation notes', 'Review engineering recommendations']
     },
     boundaries: ['Assistant workflows here support hands-on delivery work and do not grant approval authority.']
   },
@@ -425,7 +464,7 @@ export const workspaceModules: Record<WorkspaceModuleId, WorkspaceModuleDefiniti
     headline: 'Work your assigned TODOs',
     description: 'Focus on the remediation and execution items relevant to your current engineering work.',
     capabilities: {
-      DEVELOPER: ['View assigned TODOs', 'Track active execution work', 'Consult AI recommendations']
+      DEVELOPER: ['View assigned TODOs', 'Track active execution work', 'Consult project recommendations']
     },
     boundaries: ['Developers receive a focused execution list instead of the platform-wide operational backlog.']
   }
@@ -439,6 +478,7 @@ export const roleNavigationOrder: Record<Role, WorkspaceModuleId[]> = {
     'projects',
     'repositories',
     'documents',
+    'documentation',
     'analyses',
     'reviews',
     'todos',
@@ -446,10 +486,11 @@ export const roleNavigationOrder: Record<Role, WorkspaceModuleId[]> = {
     'audit',
     'system-health'
   ],
-  MANAGER: ['dashboard', 'projects', 'repositories', 'teams', 'todos', 'reviews', 'reports', 'sprint'],
-  ARCHITECT: ['dashboard', 'projects', 'repositories', 'architecture', 'dependencies', 'documentation', 'impact'],
-  QA: ['dashboard', 'projects', 'repositories', 'quality', 'security', 'reviews', 'todos'],
-  DEVELOPER: ['dashboard', 'projects', 'repositories', 'documentation', 'assistant', 'my-todos']
+  MANAGER: ['dashboard', 'projects', 'repositories', 'documents', 'documentation', 'analyses', 'todos', 'reviews', 'conversations', 'reports', 'sprint'],
+  ARCHITECT: ['dashboard', 'projects', 'repositories', 'documents', 'documentation', 'architecture', 'dependencies', 'impact'],
+  QA: ['dashboard', 'projects', 'documents', 'documentation', 'analyses', 'quality', 'security', 'reviews', 'todos'],
+  DEVELOPER: ['dashboard', 'projects', 'repositories', 'documents', 'documentation', 'todos', 'conversations', 'assistant', 'my-todos'],
+  AUDITOR: ['dashboard', 'documents', 'documentation', 'analyses', 'reviews']
 };
 
 export function formatRoleLabel(role: Role) {
@@ -473,6 +514,10 @@ export function resolvePageTitle(pathname: string) {
 
   if (pathname.startsWith('/dashboard/teams/')) {
     return 'Team Details';
+  }
+
+  if (pathname.startsWith('/dashboard/projects/')) {
+    return 'Project Details';
   }
 
   if (pathname === '/settings/profile') {

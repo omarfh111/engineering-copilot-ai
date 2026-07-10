@@ -9,6 +9,10 @@ import org.example.copilote.entity.AnalysisType;
 @Setter
 public class AnalysisSearchRequest extends PageQueryRequest {
 
+    private String search;
+
+    private Long projectId;
+
     private AnalysisStatus status;
 
     private AnalysisType type;

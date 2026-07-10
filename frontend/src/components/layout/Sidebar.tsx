@@ -44,28 +44,32 @@ export function Sidebar({ currentUser, mobileOpen, onClose, onToggleMobile }: Si
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <div className="mb-8 flex items-center gap-3">
-          <EngineeringCopilotMark className="h-12 w-12 rounded-2xl" />
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-300">
-              Engineering Copilot
+        {/* Top Header & User Card - Fixed height container */}
+        <div className="flex-shrink-0">
+          <div className="mb-8 flex items-center gap-3">
+            <EngineeringCopilotMark className="h-12 w-12 rounded-2xl" />
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-300">
+                Engineering Copilot
+              </p>
+              <h1 className="text-lg font-semibold text-slate-900 dark:text-white">{roleDefinition.workspaceName}</h1>
+            </div>
+          </div>
+
+          <div className="mb-6 rounded-3xl bg-gradient-to-br from-brand-600 to-indigo-700 p-5 text-white">
+            <p className="text-xs uppercase tracking-[0.24em] text-brand-100">Active workspace</p>
+            <p className="mt-3 text-lg font-semibold">
+              {currentUser.firstName} {currentUser.lastName}
             </p>
-            <h1 className="text-lg font-semibold text-slate-900 dark:text-white">{roleDefinition.workspaceName}</h1>
+            <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-100">
+              <ShieldCheck className="h-3.5 w-3.5" />
+              {formatRole(currentUser.role)}
+            </div>
           </div>
         </div>
 
-        <div className="mb-6 rounded-3xl bg-gradient-to-br from-brand-600 to-indigo-700 p-5 text-white">
-          <p className="text-xs uppercase tracking-[0.24em] text-brand-100">Active workspace</p>
-          <p className="mt-3 text-lg font-semibold">
-            {currentUser.firstName} {currentUser.lastName}
-          </p>
-          <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-brand-100">
-            <ShieldCheck className="h-3.5 w-3.5" />
-            {formatRole(currentUser.role)}
-          </div>
-        </div>
-
-        <nav className="space-y-2">
+        {/* Navigation - Takes up remaining height and handles scrolling */}
+        <nav className="flex-1 min-h-0 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
           {navigationItems.map((item) => {
             const Icon = item.icon;
 
@@ -89,10 +93,11 @@ export function Sidebar({ currentUser, mobileOpen, onClose, onToggleMobile }: Si
           })}
         </nav>
 
-        <div className="mt-auto rounded-3xl border border-dashed border-brand-200 bg-brand-50/80 p-4 text-sm text-brand-700 dark:border-brand-900/50 dark:bg-brand-950/30 dark:text-brand-200">
+        {/* Bottom Panel - Pinned to footer */}
+        <div className="mt-6 flex-shrink-0 rounded-3xl border border-dashed border-brand-200 bg-brand-50/80 p-4 text-sm text-brand-700 dark:border-brand-900/50 dark:bg-brand-950/30 dark:text-brand-200">
           <div className="flex items-center gap-2">
             <BellDot className="h-4 w-4" />
-            <p className="font-semibold">AI workflow ready</p>
+            <p className="font-semibold">Workspace ready</p>
           </div>
           <p className="mt-2 text-xs leading-6 opacity-80">
             {roleDefinition.accessSummary}

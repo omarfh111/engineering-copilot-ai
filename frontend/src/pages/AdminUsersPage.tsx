@@ -19,7 +19,7 @@ import { adminUserService } from '../services/adminUserService';
 import type { AdminUserListFilters, AdminUserStatusFilter, CreateAdminUserPayload } from '../types/admin';
 import type { Role, UpdateUserPayload, User } from '../types/user';
 
-const roleOptions: Array<Role | ''> = ['', 'ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER'];
+const roleOptions: Array<Role | ''> = ['', 'ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'];
 const statusOptions: AdminUserStatusFilter[] = ['', 'ACTIVE', 'DISABLED', 'LOCKED'];
 
 const defaultFilters: AdminUserListFilters = {

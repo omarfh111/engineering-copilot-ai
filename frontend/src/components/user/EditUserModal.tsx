@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { X } from 'lucide-react';
+import { LoaderCircle, X } from 'lucide-react';
+import { adminUserService } from '../../services/adminUserService';
+import type { TeamOption } from '../../types/admin';
 import type { Role, UpdateUserPayload, User } from '../../types/user';
 
 interface EditUserModalProps {
@@ -12,9 +14,12 @@ interface EditUserModalProps {
   onSubmit: (payload: UpdateUserPayload) => void;
 }
 
-const roles: Role[] = ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER'];
+const roles: Role[] = ['ADMIN', 'MANAGER', 'ARCHITECT', 'QA', 'DEVELOPER', 'AUDITOR'];
 
 export function EditUserModal({ open, user, isAdmin, loading, onClose, onSubmit }: EditUserModalProps) {
+  const [teams, setTeams] = useState<TeamOption[]>([]);
+  const [loadingTeams, setLoadingTeams] = useState(false);
+  const [teamLoadError, setTeamLoadError] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -40,10 +45,31 @@ export function EditUserModal({ open, user, isAdmin, loading, onClose, onSubmit 
         password: '',
         role: user.role,
         enabled: user.enabled,
-        accountLocked: user.accountLocked
+        accountLocked: user.accountLocked,
+        teamId: user.teams[0]?.id ?? ''
       });
     }
   }, [reset, user]);
+
+  useEffect(() => {
+    if (!open || !isAdmin) {
+      setTeams([]);
+      setTeamLoadError(null);
+      return;
+    }
+
+    setLoadingTeams(true);
+    setTeamLoadError(null);
+
+    void adminUserService
+      .getTeamOptions()
+      .then((options) => setTeams(options))
+      .catch(() => {
+        setTeams([]);
+        setTeamLoadError('Teams could not be loaded.');
+      })
+      .finally(() => setLoadingTeams(false));
+  }, [isAdmin, open]);
 
   if (!open || !user) {
     return null;
@@ -148,6 +174,23 @@ export function EditUserModal({ open, user, isAdmin, loading, onClose, onSubmit 
                 </select>
               </label>
 
+              <label className="space-y-2 md:col-span-2">
+                <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Team</span>
+                <select
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-brand-500 dark:focus:ring-brand-500/10"
+                  disabled={loadingTeams || Boolean(teamLoadError)}
+                  {...register('teamId')}
+                >
+                  <option value="">{loadingTeams ? 'Loading teams...' : 'No team assigned'}</option>
+                  {teams.map((team) => (
+                    <option key={team.id} value={team.id}>
+                      {team.name}
+                    </option>
+                  ))}
+                </select>
+                {teamLoadError ? <p className="text-sm text-rose-600">{teamLoadError}</p> : null}
+              </label>
+
               <label className="flex items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 dark:border-slate-700 dark:bg-slate-950">
                 <div>
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-200">Enabled</p>
@@ -183,7 +226,14 @@ export function EditUserModal({ open, user, isAdmin, loading, onClose, onSubmit 
               disabled={loading}
               type="submit"
             >
-              {loading ? 'Saving changes...' : 'Save changes'}
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <LoaderCircle className="h-4 w-4 animate-spin" />
+                  Saving changes...
+                </span>
+              ) : (
+                'Save changes'
+              )}
             </button>
           </div>
         </form>

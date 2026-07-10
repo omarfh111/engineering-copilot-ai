@@ -15,6 +15,8 @@ public class ProjectSummaryResponse {
 
     private final String title;
 
+    private final String description;
+
     private final String status;
 
     private final String teamName;

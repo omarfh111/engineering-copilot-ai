@@ -16,40 +16,52 @@ public class Repository {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "repo_id")
     private Long repoId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "url", nullable = false, length = 500)
     private String url;
 
-    @Column(nullable = false)
+    @Column(name = "technology", length = 100)
     private String technology;
 
-    @Column(nullable = false)
-    private String provider;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", nullable = false)
+    private RepositoryProvider provider;
 
-    @Column(nullable = false)
-    private String branch;
+    @Builder.Default
+    @Column(name = "branch", length = 100)
+    private String branch = "main";
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
     @PrePersist
     public void prePersist() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+
+        if (branch == null || branch.trim().isEmpty()) {
+            branch = "main";
+        }
     }
 
     @PreUpdate
     public void preUpdate() {
         updatedAt = LocalDateTime.now();
+
+        if (branch == null || branch.trim().isEmpty()) {
+            branch = "main";
+        }
     }
 }

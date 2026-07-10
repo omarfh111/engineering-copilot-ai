@@ -5,12 +5,13 @@ import org.example.copilote.entity.ReviewStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ReviewRepository extends JpaRepository<Review, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
 
     List<Review> findByStatus(ReviewStatus status);
 
@@ -20,4 +21,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     Page<Review> findByStatus(ReviewStatus status, Pageable pageable);
 
+    List<Review> findByAnalysisAnalysisId(Long analysisId);
+
+    List<Review> findByAnalysisProjectProjectId(Long projectId);
 }

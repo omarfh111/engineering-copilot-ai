@@ -298,13 +298,13 @@ function buildDeveloperOverview(
     createMetric('assigned-tasks', 'Assigned Tasks', activeTasks, 'Active TODO items in your execution view', 'todos'),
     createMetric('repositories', 'Repositories', repositories?.totalElements ?? overview.stats.repositories, 'Connected codebases available for work', 'repositories'),
     createMetric('recent-analyses', 'Recent Analyses', analysisRecords.length, 'Analysis history available in your workspace', 'analyses'),
-    createMetric('ai-suggestions', 'AI Suggestions', overview.aiRecommendations.length, 'Current AI recommendations surfaced for action', 'assistant'),
+    createMetric('recommendations', 'Recommendations', overview.aiRecommendations.length, 'Current recommendations surfaced for action', 'assistant'),
     createMetric('recent-documentation', 'Documentation', documents?.totalElements ?? overview.stats.documents, 'Technical references available for implementation', 'documentation')
   ];
   base.highlights = [
     createHighlight('projects', 'Active projects', String(projects?.totalElements ?? overview.stats.projects), 'Project contexts currently available to you.'),
     createHighlight('latest-analysis', 'Latest analysis', mapAnalysisRecord(analysisRecords[0] ?? {}, 0).type, 'Most recent repository insight in your workspace.'),
-    createHighlight('knowledge', 'Documentation source', `${documents?.totalElements ?? 0} assets`, 'Project documents available for AI-assisted work.')
+    createHighlight('knowledge', 'Documentation source', `${documents?.totalElements ?? 0} assets`, 'Project documents available for delivery work.')
   ];
   base.recentProjects = projects?.content.slice(0, 5).map(mapProjectRecord) ?? overview.recentProjects;
   base.recentAnalyses = analyses?.content.slice(0, 5).map(mapAnalysisRecord) ?? overview.recentAnalyses;

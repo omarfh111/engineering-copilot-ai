@@ -21,7 +21,7 @@ function sortUsers(users: User[]) {
 }
 
 function normalizeRole(role: ApiRole) {
-  return role === 'AUDITOR' ? 'MANAGER' : role;
+  return role;
 }
 
 type ApiTeamMember = Omit<TeamMember, 'role'> & { role: ApiRole };
