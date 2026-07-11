@@ -8,7 +8,7 @@ import { DeleteDocumentationDialog } from '../components/documentation/DeleteDoc
 import { DocumentationFormModal } from '../components/documentation/DocumentationFormModal';
 import { useSession } from '../context/SessionContext';
 import { useToast } from '../context/ToastContext';
-import { getApiErrorMessage, resolveFileUrl } from '../lib/api';
+import { getApiErrorMessage, getLocalFileReference, resolveFileUrl } from '../lib/api';
 import { formatDocumentationStatus, formatDocumentationType, getDocumentationStatusTone } from '../lib/documentation';
 import { formatDate, formatRole } from '../lib/formatters';
 import { adminDocumentationService } from '../services/adminDocumentationService';
@@ -33,6 +33,10 @@ export function DocumentationDetailsPage() {
   const canManageDocumentation = currentUser?.role === 'ADMIN' || currentUser?.role === 'ARCHITECT';
   const canDeleteDocumentation = currentUser?.role === 'ADMIN';
   const fileUrl = useMemo(() => resolveFileUrl(documentation?.path), [documentation?.path]);
+  const localFile = useMemo(() => getLocalFileReference(documentation?.path), [documentation?.path]);
+  const fileType = localFile?.type ?? '';
+  const isImagePreview = fileType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(documentation?.path ?? '');
+  const canInlinePreview = Boolean(fileUrl && (isImagePreview || fileType === 'application/pdf' || /\.pdf$/i.test(documentation?.path ?? '')));
 
   const loadDocumentation = async () => {
     if (!Number.isFinite(documentationId)) {
@@ -132,9 +136,14 @@ export function DocumentationDetailsPage() {
       return;
     }
 
+    const pathName = documentation.path?.split(/[\\/]/).pop() ?? '';
+    const extension = pathName.includes('.') ? pathName.slice(pathName.lastIndexOf('.')) : '';
+    const downloadName = extension && !documentation.title.toLowerCase().endsWith(extension.toLowerCase())
+      ? `${documentation.title}${extension}`
+      : documentation.title;
     const anchor = window.document.createElement('a');
     anchor.href = fileUrl;
-    anchor.download = documentation.title;
+    anchor.download = downloadName;
     anchor.rel = 'noreferrer';
     anchor.target = '_blank';
     anchor.click();
@@ -303,6 +312,19 @@ export function DocumentationDetailsPage() {
         <div className="mt-5 max-h-[520px] overflow-auto rounded-2xl border border-white/10 bg-slate-950/75 p-5 text-sm leading-7 text-slate-200">
           {documentation.content ? <pre className="whitespace-pre-wrap font-sans">{documentation.content}</pre> : 'No content has been added yet.'}
         </div>
+        {fileUrl ? (
+          <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/75">
+            {canInlinePreview ? (
+              isImagePreview ? (
+                <img alt={documentation.title} className="max-h-[640px] w-full object-contain" src={fileUrl} />
+              ) : (
+                <iframe className="h-[640px] w-full" src={fileUrl} title={documentation.title} />
+              )
+            ) : (
+              <p className="p-5 text-sm text-slate-400">This file type cannot be embedded here. Use Preview or Download to open it.</p>
+            )}
+          </div>
+        ) : null}
         {documentation.path ? <p className="mt-4 break-all text-sm text-slate-400">Path: {documentation.path}</p> : null}
       </section>
 

@@ -202,7 +202,7 @@ export function AdminUsersPage() {
               {userPage?.totalElements ?? 0} users matched
             </div>
             <button
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-brand-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white transition hover:from-brand-400 hover:to-indigo-400"
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-600"
               onClick={() => setCreateOpen(true)}
               type="button"
             >

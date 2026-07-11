@@ -97,7 +97,15 @@ export function EditUserModal({ open, user, isAdmin, loading, onClose, onSubmit 
           </button>
         </div>
 
-        <form className="mt-6 space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="mt-6 space-y-5"
+          onSubmit={handleSubmit((values) =>
+            onSubmit({
+              ...values,
+              role: values.role?.replace(/^ROLE_/, '') as Role | undefined
+            })
+          )}
+        >
           <div className="grid gap-5 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-sm font-medium text-slate-700 dark:text-slate-200">First name</span>
@@ -164,7 +172,10 @@ export function EditUserModal({ open, user, isAdmin, loading, onClose, onSubmit 
                 <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Role</span>
                 <select
                   className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:focus:border-brand-500 dark:focus:ring-brand-500/10"
-                  {...register('role')}
+                  {...register('role', {
+                    required: 'Role is required',
+                    setValueAs: (value) => String(value).replace(/^ROLE_/, '')
+                  })}
                 >
                   {roles.map((role) => (
                     <option key={role} value={role}>
@@ -172,6 +183,7 @@ export function EditUserModal({ open, user, isAdmin, loading, onClose, onSubmit 
                     </option>
                   ))}
                 </select>
+                {errors.role ? <p className="text-sm text-rose-600">{errors.role.message}</p> : null}
               </label>
 
               <label className="space-y-2 md:col-span-2">

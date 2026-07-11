@@ -13,7 +13,7 @@ import { DocumentationTable } from '../components/documentation/DocumentationTab
 import { useSession } from '../context/SessionContext';
 import { useToast } from '../context/ToastContext';
 import { useDebounce } from '../hooks/useDebounce';
-import { getApiErrorMessage } from '../lib/api';
+import { getApiErrorMessage, resolveFileUrl } from '../lib/api';
 import {
   documentationStatusOptions,
   documentationTypeOptions,
@@ -212,7 +212,11 @@ export function DocumentationPage() {
       return;
     }
 
-    window.open(documentation.path, '_blank', 'noopener,noreferrer');
+    const fileUrl = resolveFileUrl(documentation.path);
+
+    if (fileUrl) {
+      window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const approvedDocumentation = documentationPage?.content.filter((entry) => entry.approved).length ?? 0;

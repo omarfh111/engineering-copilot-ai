@@ -27,7 +27,7 @@ public class Team {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "leader_id")
+    @JoinColumn(name = "leader_id", nullable = true)
     private User leader;
 
     @Builder.Default

@@ -31,7 +31,7 @@ import { DeleteProjectDialog } from '../components/project/DeleteProjectDialog';
 import { ProjectFormModal } from '../components/project/ProjectFormModal';
 import { useSession } from '../context/SessionContext';
 import { useToast } from '../context/ToastContext';
-import { getApiErrorMessage } from '../lib/api';
+import { getApiErrorMessage, resolveFileUrl } from '../lib/api';
 import { formatDate } from '../lib/formatters';
 import { formatProjectStatus, getProjectStatusTone } from '../lib/project';
 import { adminDocumentService } from '../services/adminDocumentService';
@@ -368,7 +368,11 @@ export function ProjectDetailsPage() {
       return;
     }
 
-    window.open(document.path, '_blank', 'noopener,noreferrer');
+    const fileUrl = resolveFileUrl(document.path);
+
+    if (fileUrl) {
+      window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const openDocumentationPath = (documentation: ProjectDocumentation) => {
@@ -376,7 +380,11 @@ export function ProjectDetailsPage() {
       return;
     }
 
-    window.open(documentation.path, '_blank', 'noopener,noreferrer');
+    const fileUrl = resolveFileUrl(documentation.path);
+
+    if (fileUrl) {
+      window.open(fileUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   const handleRepositorySort = (field: string) => {

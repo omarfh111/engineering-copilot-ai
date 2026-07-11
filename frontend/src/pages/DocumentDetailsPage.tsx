@@ -8,10 +8,11 @@ import { LoadingSkeleton } from '../components/common/LoadingSkeleton';
 import { StatusBadge } from '../components/common/StatusBadge';
 import { useSession } from '../context/SessionContext';
 import { useToast } from '../context/ToastContext';
-import { getApiErrorMessage, resolveFileUrl } from '../lib/api';
+import { getApiErrorMessage, getLocalFileReference, resolveFileUrl } from '../lib/api';
 import { formatDocumentType } from '../lib/document';
 import { getFileIcon, getFileTypeLabel, supportedFileExtensions } from '../lib/fileMeta';
 import { formatDate } from '../lib/formatters';
+import { calculateRiskScore, getRiskTierColor, getRiskTierLabel, type FileMetadata } from '../lib/riskScoring';
 import { adminDocumentService } from '../services/adminDocumentService';
 import { adminProjectService } from '../services/adminProjectService';
 import type { DocumentProjectSummary, SourceDocument, UpdateDocumentPayload } from '../types/document';
@@ -33,7 +34,24 @@ export function DocumentDetailsPage() {
   const documentId = Number(id);
   const canManageDocuments = currentUser?.role === 'ADMIN';
   const fileUrl = useMemo(() => resolveFileUrl(sourceDocument?.path), [sourceDocument?.path]);
+  const localFile = useMemo(() => getLocalFileReference(sourceDocument?.path), [sourceDocument?.path]);
+  const fileType = localFile?.type ?? '';
+  const isImagePreview = fileType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(sourceDocument?.path ?? '');
+  const canInlinePreview = Boolean(fileUrl && (isImagePreview || fileType === 'application/pdf' || /\.pdf$/i.test(sourceDocument?.path ?? '')));
   const FileIcon = getFileIcon(sourceDocument?.path);
+
+  const riskScore = useMemo(() => {
+    if (!sourceDocument) return null;
+    
+    const metadata: FileMetadata = {
+      type: sourceDocument.type,
+      source: sourceDocument.source,
+      path: sourceDocument.path,
+      generatedExternally: sourceDocument.source?.toLowerCase().includes('external') || sourceDocument.source?.toLowerCase().includes('third-party')
+    };
+    
+    return calculateRiskScore(metadata);
+  }, [sourceDocument]);
 
   const loadDocument = async () => {
     if (!Number.isFinite(documentId)) {
@@ -133,9 +151,14 @@ export function DocumentDetailsPage() {
       return;
     }
 
+    const pathName = sourceDocument.path?.split(/[\\/]/).pop() ?? '';
+    const extension = pathName.includes('.') ? pathName.slice(pathName.lastIndexOf('.')) : '';
+    const downloadName = extension && !sourceDocument.title.toLowerCase().endsWith(extension.toLowerCase())
+      ? `${sourceDocument.title}${extension}`
+      : sourceDocument.title;
     const anchor = window.document.createElement('a');
     anchor.href = fileUrl;
-    anchor.download = sourceDocument.title;
+    anchor.download = downloadName;
     anchor.rel = 'noreferrer';
     anchor.target = '_blank';
     anchor.click();
@@ -188,6 +211,11 @@ export function DocumentDetailsPage() {
             <div className="mt-4 flex flex-wrap gap-2">
               <StatusBadge label={formatDocumentType(sourceDocument.type)} tone="brand" />
               <StatusBadge label={getFileTypeLabel(sourceDocument.path, 'Reference')} tone="neutral" />
+              {riskScore && (
+                <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${getRiskTierColor(riskScore.tier)}`}>
+                  {getRiskTierLabel(riskScore.tier)}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -265,6 +293,23 @@ export function DocumentDetailsPage() {
           </div>
           <p className="mt-4 text-xl font-semibold text-white">{formatDate(sourceDocument.updatedAt)}</p>
         </div>
+      </section>
+
+      <section className="page-shell border-white/10 bg-slate-950/60">
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">Read</p>
+        {fileUrl && canInlinePreview ? (
+          <div className="mt-5 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/75">
+            {isImagePreview ? (
+              <img alt={sourceDocument.title} className="max-h-[640px] w-full object-contain" src={fileUrl} />
+            ) : (
+              <iframe className="h-[640px] w-full" src={fileUrl} title={sourceDocument.title} />
+            )}
+          </div>
+        ) : (
+          <p className="mt-4 text-sm leading-7 text-slate-400">
+            {fileUrl ? 'This file type cannot be embedded here. Use Preview or Download to open it.' : 'No readable file path has been added yet.'}
+          </p>
+        )}
       </section>
 
       <section className="page-shell border-white/10 bg-slate-950/60">

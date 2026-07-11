@@ -4,6 +4,7 @@ import type { ApiRole, PagedResponse, TeamSummary, UpdateUserPayload, User, User
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8081';
 const TOKEN_STORAGE_KEY = 'copilote_token';
+const LOCAL_FILE_STORAGE_PREFIX = 'copilote_local_file:';
 
 interface AuthResponse {
   token: string | null;
@@ -19,7 +20,7 @@ type ApiTeamSummary = Partial<TeamSummary> & {
 };
 
 type ApiUser = Omit<User, 'role' | 'teams'> & {
-  role: ApiRole;
+  role: ApiRole | string;
   teams?: ApiTeamSummary[];
 };
 
@@ -30,20 +31,77 @@ export const apiClient = axios.create({
   }
 });
 
-export function resolveFileUrl(path: string | null | undefined) {
-  if (!path) {
+export function saveLocalFileReference(file: File, dataUrl: string) {
+  const key = `local-file:${Date.now()}:${file.name.replace(/[^a-z0-9._-]/gi, '_')}`;
+
+  localStorage.setItem(
+    `${LOCAL_FILE_STORAGE_PREFIX}${key}`,
+    JSON.stringify({
+      dataUrl,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      savedAt: new Date().toISOString()
+    })
+  );
+
+  return key;
+}
+
+export function getLocalFileReference(path: string | null | undefined) {
+  const trimmedPath = path?.trim();
+
+  if (!trimmedPath?.startsWith('local-file:')) {
     return null;
   }
 
-  if (/^https?:\/\//i.test(path)) {
-    return path;
+  const storedValue = localStorage.getItem(`${LOCAL_FILE_STORAGE_PREFIX}${trimmedPath}`);
+
+  if (!storedValue) {
+    return null;
   }
 
-  if (path.startsWith('/')) {
-    return `${API_BASE_URL}${path}`;
+  try {
+    return JSON.parse(storedValue) as {
+      dataUrl: string;
+      name: string;
+      type: string;
+      size: number;
+      savedAt: string;
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function resolveFileUrl(path: string | null | undefined) {
+  const trimmedPath = path?.trim();
+
+  if (!trimmedPath) {
+    return null;
   }
 
-  return `${API_BASE_URL}/${path}`;
+  const localFile = getLocalFileReference(trimmedPath);
+
+  if (localFile) {
+    return localFile.dataUrl;
+  }
+
+  if (/^(https?:|blob:|data:)/i.test(trimmedPath)) {
+    return trimmedPath;
+  }
+
+  if (/^file:\/\//i.test(trimmedPath)) {
+    return trimmedPath;
+  }
+
+  const normalizedPath = trimmedPath.replace(/\\/g, '/');
+
+  if (normalizedPath.startsWith('/')) {
+    return `${API_BASE_URL}${normalizedPath}`;
+  }
+
+  return `${API_BASE_URL}/${normalizedPath}`;
 }
 
 apiClient.interceptors.request.use((config) => {
@@ -62,8 +120,30 @@ function removeEmptyValues(params: UserQueryParams) {
   );
 }
 
-function normalizeRole(role: ApiRole) {
-  return role;
+function normalizeRole(role: ApiRole | string) {
+  switch (role) {
+    case 'ROLE_ADMIN':
+      return 'ADMIN';
+    case 'ROLE_MANAGER':
+      return 'MANAGER';
+    case 'ROLE_ARCHITECT':
+      return 'ARCHITECT';
+    case 'ROLE_QA':
+      return 'QA';
+    case 'ROLE_DEVELOPER':
+      return 'DEVELOPER';
+    case 'ROLE_AUDITOR':
+      return 'AUDITOR';
+    case 'ADMIN':
+    case 'MANAGER':
+    case 'ARCHITECT':
+    case 'QA':
+    case 'DEVELOPER':
+    case 'AUDITOR':
+      return role;
+    default:
+      return 'DEVELOPER';
+  }
 }
 
 function normalizeTeamSummary(team: ApiTeamSummary) {

@@ -95,7 +95,7 @@ export function UserTable({ users, sortBy, sortDirection, onSort, onView, onEdit
                   </td>
                   <td className="px-6 py-5 text-sm text-slate-600 dark:text-slate-300">{user.email}</td>
                   <td className="px-6 py-5">
-                    <StatusBadge label={formatRole(user.role)} tone="brand" />
+                    <StatusBadge label={formatRole(user.role)} tone="role" />
                   </td>
                   <td className="px-6 py-5">
                     <StatusBadge label={accountStatus.label} tone={accountStatus.tone} />

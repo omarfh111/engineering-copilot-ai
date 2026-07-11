@@ -101,18 +101,31 @@ function stripEmptyPassword<T extends { password?: string }>(payload: T) {
   };
 }
 
+function normalizeUserPayloadRole<T extends { role?: string }>(payload: T) {
+  if (!payload.role) {
+    return payload;
+  }
+
+  return {
+    ...payload,
+    role: payload.role.replace(/^ROLE_/, '').trim()
+  };
+}
+
 async function syncSingleTeamMembership(
   user: User,
   teamId: number | string | undefined
 ) {
   const desiredTeamId = normalizeOptionalTeamId(teamId);
 
-  if (desiredTeamId === undefined) {
+  // If no team is specified, just return the user without any team operations
+  if (desiredTeamId === undefined || desiredTeamId === null) {
     return userApi.getUserById(user.id);
   }
 
-  const currentTeamIds = user.teams.map((team) => team.id);
+  const currentTeamIds = (user.teams ?? []).map((team) => team.id);
 
+  // Remove user from all teams except the desired one
   await Promise.all(
     currentTeamIds
       .filter((id) => id !== desiredTeamId)
@@ -121,13 +134,18 @@ async function syncSingleTeamMembership(
       )
   );
 
+  // Add user to the desired team if not already a member
   if (
     desiredTeamId &&
     !currentTeamIds.includes(desiredTeamId)
   ) {
-    await apiClient.post(
-      `/api/teams/${desiredTeamId}/users/${user.id}`
-    );
+    try {
+      await apiClient.post(
+        `/api/teams/${desiredTeamId}/users/${user.id}`
+      );
+    } catch (error) {
+      console.warn('Failed to add user to team, but user creation succeeded:', error);
+    }
   }
 
   return userApi.getUserById(user.id);
@@ -214,16 +232,29 @@ export const adminUserService = {
 
   async createUser(payload: CreateAdminUserPayload) {
     const { teamId, ...userPayload } = payload;
-
-    const response = await apiClient.post<User>(
-      '/api/users',
+    const requestPayload = normalizeUserPayloadRole(
       stripEmptyPassword(userPayload)
     );
 
-    return syncSingleTeamMembership(
-      response.data,
-      teamId
-    );
+    try {
+      const response = await apiClient.post<User>(
+        '/api/users',
+        requestPayload
+      );
+
+      // Only sync team membership if teamId is provided and not empty
+      if (teamId && teamId !== '') {
+        return syncSingleTeamMembership(
+          response.data,
+          teamId
+        );
+      }
+
+      return response.data;
+    } catch (error) {
+      console.error('User creation failed:', error);
+      throw error;
+    }
   },
 
   async updateUser(
@@ -231,10 +262,21 @@ export const adminUserService = {
     payload: UpdateUserPayload
   ) {
     const { teamId, ...userPayload } = payload;
+    const normalizedPayload = normalizeUserPayloadRole(
+      stripEmptyPassword(userPayload)
+    );
+
+    // Add ROLE_ prefix for backend compatibility if role is provided
+    const requestPayload = normalizedPayload.role
+      ? {
+          ...normalizedPayload,
+          role: `ROLE_${normalizedPayload.role}`
+        }
+      : normalizedPayload;
 
     const response = await apiClient.put<User>(
       `/api/users/${id}`,
-      stripEmptyPassword(userPayload)
+      requestPayload
     );
 
     return syncSingleTeamMembership(

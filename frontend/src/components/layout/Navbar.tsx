@@ -1,10 +1,11 @@
-import { Bell, LogOut, MoonStar, Search, ShieldCheck, SunMedium } from 'lucide-react';
+import { LogOut, MoonStar, Search, ShieldCheck, SunMedium } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatRole, getInitials } from '../../lib/formatters';
 import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
 import { resolvePageTitle } from '../../lib/workspace';
 import type { User } from '../../types/user';
+import { NotificationCenter } from './NotificationCenter';
 
 interface NavbarProps {
   currentUser: User;
@@ -17,7 +18,7 @@ export function Navbar({ currentUser }: NavbarProps) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <header className="glass-panel flex flex-col gap-4 rounded-[28px] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <header className="glass-panel relative z-50 flex flex-col gap-4 rounded-[28px] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-300">
           Enterprise Dashboard
@@ -35,12 +36,7 @@ export function Navbar({ currentUser }: NavbarProps) {
           />
         </div>
 
-        <button
-          className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition hover:border-brand-300 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-200 dark:hover:border-brand-500 dark:hover:text-brand-300"
-          type="button"
-        >
-          <Bell className="h-4 w-4" />
-        </button>
+        <NotificationCenter />
 
         <button
           className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-700 transition hover:border-brand-300 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-200 dark:hover:border-brand-500 dark:hover:text-brand-300"

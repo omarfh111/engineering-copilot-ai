@@ -86,7 +86,15 @@ export function CreateUserModal({ open, loading, onClose, onSubmit }: CreateUser
           </div>
         </div>
 
-        <form className="space-y-6 px-6 py-6 sm:px-7" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="space-y-6 px-6 py-6 sm:px-7"
+          onSubmit={handleSubmit((values) =>
+            onSubmit({
+              ...values,
+              role: values.role.replace(/^ROLE_/, '') as Role
+            })
+          )}
+        >
           <div className="grid gap-5 md:grid-cols-2">
             <label className="space-y-2">
               <span className="text-sm font-medium text-slate-200">First Name</span>
@@ -151,7 +159,10 @@ export function CreateUserModal({ open, loading, onClose, onSubmit }: CreateUser
               <span className="text-sm font-medium text-slate-200">Role</span>
               <select
                 className="w-full rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10"
-                {...register('role', { required: 'Role is required' })}
+                {...register('role', {
+                  required: 'Role is required',
+                  setValueAs: (value) => String(value).replace(/^ROLE_/, '')
+                })}
               >
                 {roles.map((role) => (
                   <option key={role} value={role}>

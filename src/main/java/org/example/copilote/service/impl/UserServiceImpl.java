@@ -116,8 +116,8 @@ public class UserServiceImpl implements UserService {
                 .email(email)
                 .password(passwordEncoder.encode(password))
                 .role(normalizeRole(request.getRole()))
-                .enabled(true)
-                .accountLocked(false)
+                .enabled(request.getEnabled() != null ? request.getEnabled() : true)
+                .accountLocked(request.getAccountLocked() != null ? request.getAccountLocked() : false)
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -238,24 +238,15 @@ public class UserServiceImpl implements UserService {
         if (request != null && request.getRole() != null) {
             Role normalizedRole = normalizeRole(request.getRole());
 
-            Specification<User> roleSpec;
-
-            if (normalizedRole == Role.MANAGER) {
-                roleSpec = (root, query, criteriaBuilder) ->
-                        criteriaBuilder.or(
-                                criteriaBuilder.equal(root.get("role"), Role.MANAGER),
-                                criteriaBuilder.equal(root.get("role"), Role.AUDITOR)
-                        );
-            } else {
-                roleSpec = (root, query, criteriaBuilder) ->
-                        criteriaBuilder.equal(root.get("role"), normalizedRole);
-            }
+            Specification<User> roleSpec = (root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("role"), normalizedRole);
 
             specification = specification.and(roleSpec);
         }
 
         return specification;
     }
+
     private User findUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));

@@ -29,6 +29,7 @@ import { TodosPage } from './pages/TodosPage';
 import { TodoDetailsPage } from './pages/TodoDetailsPage';
 import { UserDetailsPage } from './pages/UserDetailsPage';
 import { WorkspaceSectionPage } from './pages/WorkspaceSectionPage';
+import { SystemHealthPage } from './pages/SystemHealthPage';
 
 const sectionModuleIds: WorkspaceModuleId[] = [
   'settings',
@@ -279,6 +280,23 @@ function App() {
         {sectionModuleIds.map((moduleId) => {
           const module = workspaceModules[moduleId];
 
+          if (moduleId === 'system-health') {
+            return (
+              <Route
+                element={
+                  <RoleGuard
+                    allowedRoles={module.allowedRoles}
+                    description={`Your role is not allowed to open the ${module.label.toLowerCase()} workspace.`}
+                  >
+                    <SystemHealthPage />
+                  </RoleGuard>
+                }
+                key={module.id}
+                path={module.path}
+              />
+            );
+          }
+
           return (
             <Route
               element={
@@ -323,6 +341,7 @@ function App() {
         <Route path="/settings/profile/edit" element={<EditProfilePage />} />
         <Route path="/profile" element={<Navigate to="/settings/profile" replace />} />
         <Route path="/profile/edit" element={<Navigate to="/settings/profile/edit" replace />} />
+        <Route path="/health" element={<Navigate replace to="/dashboard/system-health" />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
     </Routes>

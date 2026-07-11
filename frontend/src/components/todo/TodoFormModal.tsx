@@ -39,6 +39,10 @@ const defaultValues: TodoFormValues = {
   analysisId: ''
 };
 
+function normalizePath(path: string) {
+  return path.trim().replace(/\\/g, '/');
+}
+
 export function TodoFormModal({
   open,
   loading,
@@ -187,7 +191,11 @@ export function TodoFormModal({
                 <span className="text-sm font-medium text-slate-200">File path</span>
                 <input
                   className="w-full rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10"
-                  {...register('filePath', { maxLength: { value: 500, message: 'File path must be 500 characters or fewer' } })}
+                  placeholder="src/pages/App.tsx or https://example.com/file"
+                  {...register('filePath', {
+                    maxLength: { value: 500, message: 'File path must be 500 characters or fewer' },
+                    setValueAs: normalizePath
+                  })}
                 />
                 {errors.filePath ? <p className="text-sm text-rose-300">{errors.filePath.message}</p> : null}
               </label>

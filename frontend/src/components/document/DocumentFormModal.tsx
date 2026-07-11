@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FileText, LoaderCircle, X } from 'lucide-react';
 import { documentTypeOptions, formatDocumentType } from '../../lib/document';
+import { saveLocalFileReference } from '../../lib/api';
 import type {
   CreateDocumentPayload,
   DocumentProjectSummary,
@@ -32,6 +33,10 @@ interface DocumentFormValues {
   projectId: string;
 }
 
+function normalizePath(path: string) {
+  return path.trim().replace(/\\/g, '/');
+}
+
 const defaultValues: DocumentFormValues = {
   title: '',
   description: '',
@@ -57,10 +62,12 @@ export function DocumentFormModal({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors }
   } = useForm<DocumentFormValues>({
     defaultValues
   });
+  const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
 
   const projectIdRegistration = register('projectId', {
     required: fixedProjectId === undefined || fixedProjectId === null ? 'Project is required' : false
@@ -69,6 +76,7 @@ export function DocumentFormModal({
   useEffect(() => {
     if (!open) {
       reset(defaultValues);
+      setSelectedFileName(null);
       return;
     }
 
@@ -80,7 +88,29 @@ export function DocumentFormModal({
       source: document?.source ?? '',
       projectId: String(fixedProjectId ?? document?.project.id ?? '')
     });
+    setSelectedFileName(null);
   }, [document, fixedProjectId, open, reset]);
+
+  const handleFileSelect = (file: File | undefined) => {
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      if (typeof reader.result !== 'string') {
+        return;
+      }
+
+      const localPath = saveLocalFileReference(file, reader.result);
+      setValue('path', localPath, { shouldDirty: true, shouldValidate: true });
+      setValue('source', file.name, { shouldDirty: true, shouldValidate: true });
+      setSelectedFileName(file.name);
+    });
+
+    reader.readAsDataURL(file);
+  };
 
   if (!open) {
     return null;
@@ -195,14 +225,23 @@ export function DocumentFormModal({
 
             <div className="grid gap-5 md:grid-cols-2">
               <label className="space-y-2">
-                <span className="text-sm font-medium text-slate-200">Path</span>
+                <span className="text-sm font-medium text-slate-200">File path or URL</span>
+                <input
+                  accept="image/*,.pdf,.doc,.docx,.txt,.md,.html,.json,.csv"
+                  className="w-full rounded-2xl border border-dashed border-white/15 bg-slate-950/60 px-4 py-3 text-sm text-slate-300 file:mr-4 file:rounded-xl file:border-0 file:bg-brand-600 file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white hover:border-brand-400/40"
+                  onChange={(event) => handleFileSelect(event.target.files?.[0])}
+                  type="file"
+                />
+                {selectedFileName ? <p className="text-xs text-brand-200">Selected: {selectedFileName}</p> : null}
                 <input
                   className="w-full rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10"
+                  placeholder="Choose a file above, or paste uploads/docs/spec.pdf / https://example.com/image.png"
                   {...register('path', {
                     maxLength: {
                       value: 500,
                       message: 'Path must be 500 characters or fewer'
-                    }
+                    },
+                    setValueAs: normalizePath
                   })}
                 />
                 {errors.path ? <p className="text-sm text-rose-300">{errors.path.message}</p> : null}
