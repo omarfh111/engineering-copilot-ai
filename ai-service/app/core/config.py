@@ -69,6 +69,14 @@ class Settings(BaseSettings):
     VECTOR_COLLECTION: str
 
     # ===============================
+    # SAE <-> IA microservice contract
+    # ===============================
+    AI_INTERNAL_API_KEY: str = ""
+    DOCUMENT_UPLOAD_DIR: str = "./data/uploads"
+    MAX_DOCUMENT_UPLOAD_BYTES: int = 10_485_760
+    DOCUMENT_COLLECTION: str = "documents_openai_text_embedding_3_small"
+
+    # ===============================
     # GitHub
     # ===============================
     GITHUB_TOKEN: str

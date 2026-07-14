@@ -2,7 +2,7 @@
 
 Microservice IA de la plateforme **Engineering Copilot**. Il transforme un corpus de documentation technique en réponses sourcées grâce à une chaîne RAG (Retrieval-Augmented Generation) exposée par FastAPI.
 
-> État du projet : **Sprint 2 - développement du socle**. La chaîne RAG et son API sont utilisables. L'ingestion dynamique de documents, l'orchestration multi-agents et le déploiement Docker restent à réaliser.
+> État du projet : **Sprint 2 - développement du socle consolidé**. La chaîne RAG, l'ingestion multipart interne et son API sont utilisables. L'orchestration multi-agents, l'audit automatique et le déploiement complet restent des travaux de Sprint 3/4.
 
 ## Répartition IA / SAE
 
@@ -67,7 +67,7 @@ Question
 
 ### Pas encore implémenté
 
-- upload et ingestion dynamique depuis Spring Boot ;
+- upload et ingestion dynamique depuis Spring Boot : les documents sont maintenant envoyés en multipart vers `POST /api/v1/documents/ingest`, avec une clé de service interne ;
 - routes métier `documents`, `projects`, `audit`, `analysis`, `todo` et `auth` ;
 - orchestrateur et agents spécialisés ;
 - analyse automatique de repositories GitHub/GitLab ;
@@ -337,7 +337,7 @@ python -m pytest -q
 
 - déplacer la collection, les modèles et les valeurs Top K vers une configuration réellement utilisée ;
 - appliquer le filtre Qdrant avant la limite Top K plutôt qu'après la recherche ;
-- ajouter une route d'ingestion idempotente et le suivi de son statut ;
+- ajouter une ingestion asynchrone idempotente et le suivi persistant de son statut ;
 - définir une authentification interne entre Spring Boot et FastAPI ;
 - normaliser les erreurs et ajouter un identifiant de corrélation ;
 - isoler les tests unitaires des tests d'intégration cloud ;

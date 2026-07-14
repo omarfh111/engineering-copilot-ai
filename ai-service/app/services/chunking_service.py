@@ -68,7 +68,10 @@ class ChunkingService:
             if chunk:
                 chunks.append(chunk)
 
-            start = max(end - self.chunk_overlap, end)
+            # Keep the requested context overlap without risking a stalled
+            # loop when an invalid overlap is configured.
+            overlap = min(max(self.chunk_overlap, 0), max(end - start - 1, 0))
+            start = end - overlap if overlap else end
 
         return chunks
 

@@ -7,12 +7,15 @@ import org.example.copilote.dto.Response.DocumentResponse;
 import org.example.copilote.dto.Response.PagedResponse;
 
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface DocumentService {
 
     PagedResponse<DocumentResponse> getAllDocuments(DocumentSearchRequest request);
 
     DocumentResponse createDocument(CreateDocumentRequest request);
+
+    DocumentResponse createDocumentWithFile(CreateDocumentRequest request, MultipartFile file);
 
     DocumentResponse getDocumentById(Long id);
 

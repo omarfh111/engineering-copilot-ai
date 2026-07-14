@@ -29,4 +29,7 @@ public class AiProperties {
      * lazily and a full generation can take tens of seconds.
      */
     private Duration responseTimeout = Duration.ofSeconds(90);
+
+    /** Shared secret sent only by Spring Boot to protected FastAPI routes. */
+    private String internalApiKey = "";
 }

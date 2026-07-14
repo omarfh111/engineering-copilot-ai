@@ -52,5 +52,13 @@ def test_chunking_service():
     assert first_chunk["text"]
 
 
+def test_split_text_keeps_configured_overlap():
+    chunker = ChunkingService(chunk_size=10, chunk_overlap=3)
+    chunks = chunker.split_text("abcdefghijklmnopqrstuvwxyz")
+
+    assert len(chunks) >= 2
+    assert chunks[0][-3:] == chunks[1][:3]
+
+
 if __name__ == "__main__":
     test_chunking_service()

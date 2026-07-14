@@ -1,15 +1,29 @@
 package org.example.copilote.client;
 
 import lombok.extern.slf4j.Slf4j;
+import org.example.copilote.config.AiProperties;
+import org.example.copilote.dto.ai.AiDocumentIngestResponse;
 import org.example.copilote.dto.ai.AiAskResponse;
 import org.example.copilote.dto.ai.AiAskSimpleRequest;
 import org.example.copilote.exception.AiServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestClientResponseException;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Thin client over the FastAPI IA RAG API.
@@ -27,13 +41,22 @@ import org.springframework.web.client.RestClientResponseException;
 public class AiRagClient {
 
     private static final String ASK_SIMPLE_URI = "/api/v1/rag/ask-simple";
-    private static final String HEALTH_URI = "/health";
+    private static final String HEALTH_URI = "/api/v1/rag/health";
+    private static final String DOCUMENT_INGEST_URI = "/api/v1/documents/ingest";
+    private static final String INTERNAL_API_KEY_HEADER = "X-Internal-Api-Key";
     private static final int MAX_ATTEMPTS = 2;
 
     private final RestClient aiRestClient;
+    private final String internalApiKey;
 
-    public AiRagClient(@Qualifier("aiRestClient") RestClient aiRestClient) {
+    public AiRagClient(@Qualifier("aiRestClient") RestClient aiRestClient, AiProperties properties) {
         this.aiRestClient = aiRestClient;
+        this.internalApiKey = resolveInternalApiKey(properties.getInternalApiKey());
+        if (!StringUtils.hasText(this.internalApiKey)) {
+            throw new IllegalStateException(
+                    "AI_INTERNAL_API_KEY is required in backend/.env or the process environment");
+        }
+        log.info("AI internal authentication configured successfully");
     }
 
     /**
@@ -49,6 +72,7 @@ public class AiRagClient {
             try {
                 return aiRestClient.post()
                         .uri(ASK_SIMPLE_URI)
+                        .header(INTERNAL_API_KEY_HEADER, internalApiKey)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(new AiAskSimpleRequest(question))
                         .retrieve()
@@ -93,6 +117,7 @@ public class AiRagClient {
         try {
             aiRestClient.get()
                     .uri(HEALTH_URI)
+                    .header(INTERNAL_API_KEY_HEADER, internalApiKey)
                     .retrieve()
                     .toBodilessEntity();
             return true;
@@ -100,5 +125,73 @@ public class AiRagClient {
             log.debug("AI health check failed: {}", ex.getMessage());
             return false;
         }
+    }
+
+    /** Send document bytes to FastAPI. Filesystem paths are never shared. */
+    public AiDocumentIngestResponse ingestDocument(
+            String filename, byte[] content, Long projectId, Long documentId
+    ) {
+        ByteArrayResource fileResource = new ByteArrayResource(content) {
+            @Override
+            public String getFilename() {
+                return filename;
+            }
+        };
+
+        HttpHeaders fileHeaders = new HttpHeaders();
+        fileHeaders.setContentDispositionFormData("file", filename);
+        fileHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        MultiValueMap<String, Object> multipart = new LinkedMultiValueMap<>();
+        multipart.add("file", new HttpEntity<>(fileResource, fileHeaders));
+        multipart.add("project_id", projectId.toString());
+        multipart.add("document_id", documentId.toString());
+
+        try {
+            return aiRestClient.post()
+                    .uri(DOCUMENT_INGEST_URI)
+                    .header(INTERNAL_API_KEY_HEADER, internalApiKey)
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(multipart)
+                    .retrieve()
+                    .body(AiDocumentIngestResponse.class);
+        } catch (RestClientResponseException ex) {
+            log.warn("AI document ingestion failed | status={} response={}",
+                    ex.getStatusCode().value(), ex.getResponseBodyAsString());
+            throw new AiServiceUnavailableException("The AI service could not index the document.");
+        } catch (ResourceAccessException ex) {
+            log.warn("AI document ingestion network failure: {}", ex.getMessage());
+            throw new AiServiceUnavailableException("The AI service could not index the document.");
+        } catch (RestClientException ex) {
+            log.warn("AI document ingestion response could not be processed: {}", ex.getMessage());
+            throw new AiServiceUnavailableException("The AI service returned an invalid ingestion response.");
+        }
+    }
+
+    private String resolveInternalApiKey(String configuredValue) {
+        String environmentValue = System.getenv("AI_INTERNAL_API_KEY");
+        if (StringUtils.hasText(environmentValue)) {
+            return environmentValue.trim();
+        }
+
+        for (Path candidate : List.of(Path.of(".env"), Path.of("backend", ".env"))) {
+            Path localEnv = candidate.toAbsolutePath().normalize();
+            if (!Files.isRegularFile(localEnv)) {
+                continue;
+            }
+            try {
+                return Files.readAllLines(localEnv).stream()
+                        .map(String::trim)
+                        .filter(line -> line.startsWith("AI_INTERNAL_API_KEY="))
+                        .map(line -> line.substring("AI_INTERNAL_API_KEY=".length()).trim())
+                        .filter(StringUtils::hasText)
+                        .reduce((first, second) -> second)
+                        .orElse(configuredValue);
+            } catch (IOException exception) {
+                log.warn("Could not read local .env file: {}", exception.getMessage());
+            }
+        }
+
+        return configuredValue == null ? "" : configuredValue.trim();
     }
 }

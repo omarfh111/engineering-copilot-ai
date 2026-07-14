@@ -2,7 +2,7 @@
 
 Ce document décrit, côté **SAE (Spring Boot)**, l'intégration au microservice
 **FastAPI IA**. Il est le pendant, côté client, du document
-`docs/ROUTAGE_SAE_IA.md` fourni dans le dépôt `engineering-copilot-ai-main`.
+`backend/docs/ROUTAGE_SAE_IA.md` fourni dans le monorepo.
 
 ## 1. Frontière et principe
 

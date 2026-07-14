@@ -3,6 +3,7 @@ package org.example.copilote.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
 
@@ -17,6 +18,7 @@ import org.springframework.web.client.RestClient;
  * independent of any Spring Boot HTTP-client helper class.</p>
  */
 @Configuration
+@PropertySource(value = "file:./.env", ignoreResourceNotFound = true)
 @EnableConfigurationProperties(AiProperties.class)
 public class AiClientConfig {
 

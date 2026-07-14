@@ -8,6 +8,7 @@ import org.example.copilote.dto.Request.UpdateDocumentRequest;
 import org.example.copilote.dto.Response.DocumentResponse;
 import org.example.copilote.dto.Response.PagedResponse;
 import org.example.copilote.dto.Response.ProjectSummaryResponse;
+import org.example.copilote.client.AiRagClient;
 import org.example.copilote.entity.Document;
 import org.example.copilote.entity.Project;
 import org.example.copilote.entity.Role;
@@ -25,12 +26,19 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +58,10 @@ public class DocumentServiceImpl implements DocumentService {
     private final DocumentRepository documentRepository;
     private final ProjectRepository projectRepository;
     private final CurrentUserProvider currentUserProvider;
+    private final AiRagClient aiRagClient;
+
+    @Value("${app.document-storage.location:./storage/documents}")
+    private String documentStorageLocation;
 
     @Override
     @Transactional(readOnly = true)
@@ -120,6 +132,47 @@ public class DocumentServiceImpl implements DocumentService {
                 .build();
 
         return mapToResponse(documentRepository.save(document));
+    }
+
+    @Override
+    public DocumentResponse createDocumentWithFile(CreateDocumentRequest request, MultipartFile file) {
+        User currentUser = currentUserProvider.getCurrentUser();
+        ensureAdmin(currentUser);
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("A non-empty document file is required");
+        }
+
+        String title = safeTrim(request.getTitle());
+        if (!StringUtils.hasText(title)) {
+            throw new IllegalArgumentException("Document title is required");
+        }
+        Project project = findProjectById(request.getProjectId());
+        if (documentRepository.existsByTitleAndProjectProjectId(title, project.getProjectId())) {
+            throw new DuplicateResourceException("Document title already exists in this project");
+        }
+
+        String filename = StringUtils.cleanPath(
+                file.getOriginalFilename() == null ? "document" : file.getOriginalFilename());
+        String storedPath = storeUploadedFile(project.getProjectId(), filename, file);
+        try {
+            Document document = Document.builder()
+                    .title(title)
+                    .description(safeTrim(request.getDescription()))
+                    .type(request.getType())
+                    .path(storedPath)
+                    .source(StringUtils.hasText(safeTrim(request.getSource())) ? safeTrim(request.getSource()) : filename)
+                    .project(project)
+                    .build();
+            document = documentRepository.save(document);
+            aiRagClient.ingestDocument(filename, file.getBytes(), project.getProjectId(), document.getDocId());
+            return mapToResponse(document);
+        } catch (IOException exception) {
+            deleteStoredFile(storedPath);
+            throw new IllegalArgumentException("The document file could not be read");
+        } catch (RuntimeException exception) {
+            deleteStoredFile(storedPath);
+            throw exception;
+        }
     }
 
     @Override
@@ -337,5 +390,44 @@ public class DocumentServiceImpl implements DocumentService {
 
         String trimmedValue = value.trim();
         return trimmedValue.isEmpty() ? null : trimmedValue;
+    }
+
+    private String storeUploadedFile(Long projectId, String filename, MultipartFile file) {
+        String lowerFilename = filename.toLowerCase();
+        if (!(lowerFilename.endsWith(".pdf") || lowerFilename.endsWith(".docx") ||
+                lowerFilename.endsWith(".txt") || lowerFilename.endsWith(".md") ||
+                lowerFilename.endsWith(".html") || lowerFilename.endsWith(".htm"))) {
+            throw new IllegalArgumentException("Only PDF, DOCX, TXT, MD and HTML documents are supported");
+        }
+        try {
+            Path root = Path.of(documentStorageLocation)
+                    .toAbsolutePath().normalize();
+            Path directory = root.resolve("project-" + projectId).normalize();
+            Files.createDirectories(directory);
+            Path target = directory.resolve(UUID.randomUUID() + "-" + filename.replaceAll("[^a-zA-Z0-9._-]", "_")).normalize();
+            if (!target.startsWith(root)) {
+                throw new IllegalArgumentException("Invalid document file name");
+            }
+            Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+            return root.relativize(target).toString().replace('\\', '/');
+        } catch (IOException exception) {
+            throw new IllegalArgumentException("The document file could not be stored");
+        }
+    }
+
+    private void deleteStoredFile(String storedPath) {
+        if (!StringUtils.hasText(storedPath)) {
+            return;
+        }
+        try {
+            Path root = Path.of(documentStorageLocation)
+                    .toAbsolutePath().normalize();
+            Path target = root.resolve(storedPath).normalize();
+            if (target.startsWith(root)) {
+                Files.deleteIfExists(target);
+            }
+        } catch (IOException ignored) {
+            // Keep the original application failure; orphan cleanup is best effort.
+        }
     }
 }

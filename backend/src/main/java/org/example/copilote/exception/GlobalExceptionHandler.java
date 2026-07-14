@@ -1,6 +1,7 @@
 package org.example.copilote.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.example.copilote.dto.Response.ErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateResourceException.class)
@@ -127,6 +129,8 @@ public class GlobalExceptionHandler {
             Exception exception,
             HttpServletRequest request
     ) {
+        log.error("Unhandled request failure | method={} path={}",
+                request.getMethod(), request.getRequestURI(), exception);
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected error occurred",

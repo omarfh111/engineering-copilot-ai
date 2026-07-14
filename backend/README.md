@@ -15,6 +15,11 @@ Application web (frontend React + backend Spring Boot) qui constitue la **platef
 
 </div>
 
+> **Structure actuelle du monorepo :** ce dossier est uniquement le backend
+> Spring Boot. Le frontend est dans [`../frontend`](../frontend), le service
+> FastAPI dans [`../ai-service`](../ai-service) et Docker Compose dans
+> [`../infra`](../infra). Utiliser le README racine comme référence de démarrage.
+
 > **État du projet — Sprint 2 (en cours, à améliorer au Sprint 3).**
 > Ce dépôt contient la partie **SAE** (React + Spring Boot + PostgreSQL). Le
 > Sprint 2 livre le socle métier **et l'intégration au service IA** : un
@@ -57,8 +62,9 @@ La solution est **distribuée** en deux dépôts :
 
 | Partie | Dépôt | Responsabilités |
 | --- | --- | --- |
-| **SAE** (ce dépôt) | `engineering-copilot-ai-sae` | Frontend React, backend Spring Boot, PostgreSQL, authentification/RBAC, gestion des utilisateurs, équipes, projets, repositories, documents, conversations, dashboard **et appel du service IA**. |
-| **IA** | `engineering-copilot-ai-main` | Microservice FastAPI : embeddings, recherche vectorielle Qdrant, reranking, génération RAG, (à venir) orchestrateur et agents. |
+| **Backend** (ce dossier) | `backend` | Spring Boot, PostgreSQL, authentification/RBAC, gestion des utilisateurs, projets, repositories, documents et appel du service IA. |
+| **Frontend** | `frontend` | Application React + Vite. |
+| **IA** | `ai-service` | Microservice FastAPI : embeddings, Qdrant, reranking et génération RAG. |
 
 > Le backend Spring Boot reste **la porte d'entrée de confiance** : il applique
 > l'authentification, les rôles et les droits, puis appelle le service IA côté
@@ -156,7 +162,7 @@ sequenceDiagram
 ## 5. Structure du dépôt
 
 ```text
-engineering-copilot-ai-sae/
+backend/
 ├── src/main/java/org/example/copilote/
 │   ├── config/            # AiProperties, AiClientConfig (RestClient IA)  ← intégration
 │   ├── client/            # AiRagClient (appel FastAPI ask-simple)        ← intégration
@@ -187,7 +193,7 @@ engineering-copilot-ai-sae/
 - **Node.js 18+** et npm.
 - **PostgreSQL** (ou Docker pour le lancer via `docker-compose.yml`).
 - Le **service IA FastAPI** en fonctionnement pour l'assistant — voir le dépôt
-  `engineering-copilot-ai-main` (nécessite une clé OpenAI et une collection Qdrant).
+  `ai-service` (nécessite une clé OpenAI et une collection Qdrant).
 
 ## 7. Démarrage rapide
 
@@ -203,7 +209,7 @@ docker compose up -d
 ### 7.2 Service IA FastAPI (dépôt séparé)
 
 ```powershell
-cd engineering-copilot-ai-main
+cd ../ai-service
 python -m venv venv ; .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 Copy-Item .env.example .env   # renseigner OPENAI_API_KEY, QDRANT_URL, ...
@@ -256,7 +262,7 @@ dans la barre latérale (rôles `ADMIN` ou `DEVELOPER`).
 
 L'assistant est le **seul point** où le backend appelle le service IA. La chaîne
 respecte le contrat de handoff défini côté IA (`docs/ROUTAGE_SAE_IA.md` du dépôt
-`engineering-copilot-ai-main`).
+`ai-service`).
 
 **Côté backend :**
 

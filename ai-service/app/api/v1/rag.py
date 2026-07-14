@@ -6,12 +6,13 @@ These endpoints expose the RAG pipeline to the frontend or Spring Boot backend.
 
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.logging import logger
 from app.services.langchain_rag_service import LangChainRAGService
 from app.api.dependencies import get_langchain_rag_service
+from app.api.security import require_internal_api_key
 
 router = APIRouter(prefix="/rag", tags=["RAG"])
 
@@ -83,7 +84,7 @@ def build_rag_service(
     )
 
 
-@router.post("/ask", response_model=RAGAskResponse)
+@router.post("/ask", response_model=RAGAskResponse, dependencies=[Depends(require_internal_api_key)])
 def ask_rag(request: RAGAskRequest):
     try:
         rag_service = build_rag_service(
@@ -109,7 +110,7 @@ def ask_rag(request: RAGAskRequest):
         )
 
 
-@router.post("/retrieve", response_model=RAGRetrieveResponse)
+@router.post("/retrieve", response_model=RAGRetrieveResponse, dependencies=[Depends(require_internal_api_key)])
 def retrieve_rag(request: RAGRetrieveRequest):
     try:
         rag_service = build_rag_service(
@@ -140,7 +141,7 @@ def retrieve_rag(request: RAGRetrieveRequest):
             detail="RAG retrieve failed",
         )
         
-@router.get("/health", response_model=RAGHealthResponse)
+@router.get("/health", response_model=RAGHealthResponse, dependencies=[Depends(require_internal_api_key)])
 def rag_health(collection_name: str = DEFAULT_COLLECTION_NAME):
     try:
         rag_service = build_rag_service(
@@ -173,7 +174,7 @@ def rag_health(collection_name: str = DEFAULT_COLLECTION_NAME):
             status_code=500,
             detail="RAG health check failed",
         )
-@router.post("/ask-simple", response_model=RAGAskResponse)
+@router.post("/ask-simple", response_model=RAGAskResponse, dependencies=[Depends(require_internal_api_key)])
 def ask_rag_simple(request: RAGAskSimpleRequest):
     try:
         rag_service = build_rag_service(

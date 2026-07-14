@@ -6,6 +6,7 @@ This avoids recreating heavy services on every request.
 
 from functools import lru_cache
 
+from app.core.config import settings
 from app.services.langchain_rag_service import LangChainRAGService
 
 
@@ -25,7 +26,7 @@ def get_langchain_rag_service(
 @lru_cache(maxsize=5)
 def get_document_rag_service() -> LangChainRAGService:
     return LangChainRAGService(
-        collection_name="documents_openai_text_embedding_3_small",
+        collection_name=settings.DOCUMENT_COLLECTION,
         embedding_provider="openai",
         embedding_model="text-embedding-3-small",
         retrieval_top_k=10,
