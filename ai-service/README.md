@@ -322,6 +322,10 @@ Attention : plusieurs tests existants appellent OpenAI et Qdrant. Certains recr�
 
 ```powershell
 python -m pytest -q
+
+# Vérification optionnelle des fournisseurs OpenAI/Qdrant/LangSmith (réseau,
+# crédits et collection de test requis ; certaines collections de test sont recréées)
+$env:RUN_LIVE_INTEGRATION_TESTS="1"; python -m pytest tests -q
 ```
 
 ## Planning des quatre sprints
@@ -350,6 +354,60 @@ python -m pytest -q
 - les clés OpenAI, Qdrant, GitHub, Hugging Face et LangSmith déjà exposées doivent être révoquées puis régénérées ;
 - FastAPI ne possède actuellement aucune authentification : ne pas l'exposer directement sur Internet ;
 - Spring Boot doit rester la frontière d'authentification utilisateur.
+
+## Vérification des fournisseurs
+
+Avant de démarrer une ingestion, une analyse de repository ou les agents Sprint 3, vérifier les accès sans exposer les clés :
+
+```powershell
+python scripts/check_provider_health.py
+```
+
+Le test vérifie OpenAI, Qdrant, GitHub, Hugging Face, LangSmith et la présence de la clé interne SAE/IA. OpenAI, Qdrant, GitHub et la clé interne sont bloquants pour le démarrage Sprint 3. Le script ne révèle jamais les valeurs de `.env`.
+
+Le premier test d'agents, sans appel LLM ni exécution du code du dépôt, est disponible pour un repository GitHub public :
+
+```powershell
+python scripts/run_foundation_analysis.py --url https://github.com/owner/repository --branch main
+```
+
+Il exécute `structure_agent` et `context_agent` en parallèle, sur une liste de fichiers limitée et filtrée.
+
+## Query rewriting and expansion
+
+The retrieval pipeline can be enhanced without changing documents or the Qdrant index:
+
+```text
+user question
+  -> semantic rewrite (optional)
+  -> 3 alternate retrieval queries (optional)
+  -> Qdrant search for each query
+  -> Reciprocal Rank Fusion (RRF)
+  -> existing reranker -> RAG answer
+```
+
+Both options are disabled by default so the validated Sprint 2 baseline remains unchanged. Enable them temporarily in `ai-service/.env`:
+
+```env
+QUERY_REWRITE_ENABLED=true
+QUERY_EXPANSION_ENABLED=true
+```
+
+An additional `HIERARCHICAL_RETRIEVAL_ENABLED=true` experiment classifies a question into `architecture`, `coding_standards`, `framework_docs` or `security` before applying the Qdrant metadata filter. Broad or cross-document questions automatically fall back to global retrieval. This mode is also disabled by default and is measured separately by the A/B script.
+
+On its first filtered request, the service creates Qdrant's `keyword` payload index for `category`. This is metadata only: existing vectors and chunks are not recreated or deleted.
+
+`POST /api/v1/rag/ask` also accepts `use_query_rewrite` and `use_query_expansion` booleans for a single-request A/B test. Its response returns the rewritten question and the generated variants.
+
+To evaluate the 64-question golden set from `ai-service`:
+
+```powershell
+python experiments/scripts/evaluate_query_transformations.py
+```
+
+The generated `experiments/results/query_transformation_ab_test.json` compares Hit@5, Precision@5, Recall@5, MRR and mean latency. The 10 negative questions are excluded because their correct evaluation belongs to answer-generation, not retrieval alone.
+
+The report evaluates the baseline, rewrite-only, rewrite-plus-expansion (with RRF), and hierarchical retrieval independently.
 
 ## Licence
 

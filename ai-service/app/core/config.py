@@ -77,9 +77,22 @@ class Settings(BaseSettings):
     DOCUMENT_COLLECTION: str = "documents_openai_text_embedding_3_small"
 
     # ===============================
+    # Query transformation (optional RAG retrieval enhancements)
+    # ===============================
+    QUERY_REWRITE_ENABLED: bool = False
+    QUERY_EXPANSION_ENABLED: bool = False
+    QUERY_EXPANSION_VARIANTS: int = 3
+    QUERY_RRF_K: int = 60
+    HIERARCHICAL_RETRIEVAL_ENABLED: bool = False
+
+    # ===============================
     # GitHub
     # ===============================
     GITHUB_TOKEN: str
+    GITHUB_API_BASE_URL: str = "https://api.github.com"
+    REPOSITORY_MAX_FILES: int = 2_000
+    REPOSITORY_MAX_FILE_BYTES: int = 1_000_000
+    REPOSITORY_ANALYSIS_MAX_TOTAL_BYTES: int = 2_000_000
 
     # ===============================
     # AI Settings

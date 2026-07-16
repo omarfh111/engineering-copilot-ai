@@ -26,6 +26,9 @@ class RAGAskRequest(BaseModel):
     collection_name: str = DEFAULT_COLLECTION_NAME
     category: Optional[str] = None
     reranker_type: str = "cross_encoder"
+    use_query_rewrite: Optional[bool] = None
+    use_query_expansion: Optional[bool] = None
+    use_hierarchical_retrieval: Optional[bool] = None
 
 class RAGHealthResponse(BaseModel):
     status: str
@@ -51,6 +54,10 @@ class RAGAskResponse(BaseModel):
     final_top_k: int
     reranker_type: str
     framework: str
+    rewritten_question: str
+    expanded_queries: List[str]
+    query_rewrite_enabled: bool
+    query_expansion_enabled: bool
 
 
 class RAGRetrieveRequest(BaseModel):
@@ -58,6 +65,9 @@ class RAGRetrieveRequest(BaseModel):
     collection_name: str = DEFAULT_COLLECTION_NAME
     category: Optional[str] = None
     reranker_type: str = "cross_encoder"
+    use_query_rewrite: Optional[bool] = None
+    use_query_expansion: Optional[bool] = None
+    use_hierarchical_retrieval: Optional[bool] = None
 
 
 class RAGRetrieveResponse(BaseModel):
@@ -95,6 +105,9 @@ def ask_rag(request: RAGAskRequest):
         result = rag_service.answer_question(
             question=request.question,
             category=request.category,
+            use_query_rewrite=request.use_query_rewrite,
+            use_query_expansion=request.use_query_expansion,
+            use_hierarchical_retrieval=request.use_hierarchical_retrieval,
         )
 
         return result
@@ -121,6 +134,9 @@ def retrieve_rag(request: RAGRetrieveRequest):
         chunks = rag_service.retrieve(
             question=request.question,
             category=request.category,
+            use_query_rewrite=request.use_query_rewrite,
+            use_query_expansion=request.use_query_expansion,
+            use_hierarchical_retrieval=request.use_hierarchical_retrieval,
         )
 
         return {

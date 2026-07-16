@@ -20,6 +20,7 @@ router = APIRouter(prefix="/documents", tags=["Documents"])
 
 class DocumentAskRequest(BaseModel):
     question: str = Field(..., min_length=3)
+    project_id: int = Field(..., ge=1)
 
 
 class DocumentSourceResponse(BaseModel):
@@ -127,6 +128,8 @@ async def ingest_document(
             file_path=str(staged_file),
             category=f"project_{project_id}",
             source_type="project_document",
+            project_id=project_id,
+            document_id=document_id,
         )
     except HTTPException:
         raise
@@ -153,7 +156,11 @@ async def ingest_document(
 def ask_uploaded_documents(request: DocumentAskRequest):
     try:
         rag_service = get_document_rag_service()
-        return rag_service.answer_question(question=request.question, category=None)
+        return rag_service.answer_question(
+            question=request.question,
+            category=None,
+            project_id=request.project_id,
+        )
     except Exception as error:
         logger.exception("Document ask failed: %s", error)
         raise HTTPException(status_code=500, detail="Document ask failed")

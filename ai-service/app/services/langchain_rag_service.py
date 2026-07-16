@@ -24,6 +24,8 @@ from app.services.embedding_service import EmbeddingService
 from app.services.qdrant_service import QdrantService
 from app.services.reranker_service import RerankerService
 from app.services.llm_reranker_service import LLMRerankerService
+from app.services.query_transformation_service import QueryTransformationService
+from app.services.query_routing_service import QueryRoutingService
 import os
 from langsmith import traceable
 
@@ -106,6 +108,14 @@ Answer in French.
         )
 
         self.chain = self.prompt | self.llm | StrOutputParser()
+        self.query_transformation_service = QueryTransformationService(
+            model_name=self.llm_model,
+            api_key=settings.OPENAI_API_KEY,
+        )
+        self.query_routing_service = QueryRoutingService(
+            model_name=self.llm_model,
+            api_key=settings.OPENAI_API_KEY,
+        )
         os.environ["LANGCHAIN_TRACING_V2"] = str(
             getattr(settings, "LANGCHAIN_TRACING_V2", "true")
         ).lower()
@@ -127,27 +137,149 @@ Answer in French.
         self,
         question: str,
         category: Optional[str] = None,
+        use_query_rewrite: Optional[bool] = None,
+        use_query_expansion: Optional[bool] = None,
+        use_hierarchical_retrieval: Optional[bool] = None,
+        project_id: Optional[int] = None,
+        repository_id: Optional[int] = None,
+        document_id: Optional[int] = None,
+        branch: Optional[str] = None,
+        commit_sha: Optional[str] = None,
     ) -> List[Dict]:
         if not question or not question.strip():
             raise ValueError("Question cannot be empty")
 
-        query_vector = self.embedding_service.embed_query(question)
-
-        retrieved_chunks = self.qdrant_service.search(
-            collection_name=self.collection_name,
-            query_vector=query_vector,
-            top_k=self.retrieval_top_k,
-            category=category,
+        transformation = self.transform_query(
+            question,
+            use_query_rewrite=use_query_rewrite,
+            use_query_expansion=use_query_expansion,
+        )
+        retrieved_chunks = self._retrieve_fused_chunks(
+            search_queries=transformation["search_queries"],
+            categories=self.route_categories(
+                question=question,
+                category=category,
+                use_hierarchical_retrieval=use_hierarchical_retrieval,
+            ),
+            project_id=project_id,
+            repository_id=repository_id,
+            document_id=document_id,
+            branch=branch,
+            commit_sha=commit_sha,
         )
 
         if self.reranker_service is not None:
             return self.reranker_service.rerank(
-                query=question,
+                query=transformation["rewritten_question"],
                 retrieved_chunks=retrieved_chunks,
                 top_k=self.final_top_k,
             )
 
         return retrieved_chunks[: self.final_top_k]
+
+    def transform_query(
+        self,
+        question: str,
+        use_query_rewrite: Optional[bool] = None,
+        use_query_expansion: Optional[bool] = None,
+    ) -> Dict:
+        """Build the retrieval queries, with safe fallback to the original question."""
+        rewrite_enabled = (
+            settings.QUERY_REWRITE_ENABLED
+            if use_query_rewrite is None
+            else use_query_rewrite
+        )
+        expansion_enabled = (
+            settings.QUERY_EXPANSION_ENABLED
+            if use_query_expansion is None
+            else use_query_expansion
+        )
+        rewritten_question = (
+            self.query_transformation_service.rewrite(question)
+            if rewrite_enabled
+            else question
+        )
+        expansions = (
+            self.query_transformation_service.expand(
+                rewritten_question,
+                max_variants=settings.QUERY_EXPANSION_VARIANTS,
+            )
+            if expansion_enabled
+            else []
+        )
+
+        search_queries = []
+        for candidate in [question, rewritten_question, *expansions]:
+            if candidate.casefold() not in {item.casefold() for item in search_queries}:
+                search_queries.append(candidate)
+
+        return {
+            "rewritten_question": rewritten_question,
+            "expanded_queries": expansions,
+            "search_queries": search_queries,
+            "query_rewrite_enabled": rewrite_enabled,
+            "query_expansion_enabled": expansion_enabled,
+        }
+
+    def _retrieve_fused_chunks(
+        self,
+        search_queries: List[str],
+        categories: List[str],
+        project_id: Optional[int] = None,
+        repository_id: Optional[int] = None,
+        document_id: Optional[int] = None,
+        branch: Optional[str] = None,
+        commit_sha: Optional[str] = None,
+    ) -> List[Dict]:
+        """Fuse results from each query using reciprocal-rank fusion (RRF)."""
+        fused = {}
+        for query in search_queries:
+            query_vector = self.embedding_service.embed_query(query)
+            for category in categories or [None]:
+                chunks = self.qdrant_service.search(
+                    collection_name=self.collection_name,
+                    query_vector=query_vector,
+                    top_k=self.retrieval_top_k,
+                    category=category,
+                    project_id=project_id,
+                    repository_id=repository_id,
+                    document_id=document_id,
+                    branch=branch,
+                    commit_sha=commit_sha,
+                )
+                for rank, chunk in enumerate(chunks, start=1):
+                    chunk_key = chunk.get("chunk_id") or (
+                        chunk.get("source"), chunk.get("page_number"), chunk.get("chunk_index")
+                    )
+                    if chunk_key not in fused:
+                        fused[chunk_key] = {
+                            **chunk,
+                            "rrf_score": 0.0,
+                            "matched_queries": [],
+                        }
+                    fused[chunk_key]["rrf_score"] += 1 / (settings.QUERY_RRF_K + rank)
+                    fused[chunk_key]["matched_queries"].append(query)
+
+        return sorted(
+            fused.values(),
+            key=lambda chunk: chunk["rrf_score"],
+            reverse=True,
+        )[: self.retrieval_top_k]
+
+    def route_categories(
+        self,
+        question: str,
+        category: Optional[str],
+        use_hierarchical_retrieval: Optional[bool],
+    ) -> List[str]:
+        if category:
+            return [category]
+        enabled = (
+            settings.HIERARCHICAL_RETRIEVAL_ENABLED
+            if use_hierarchical_retrieval is None
+            else use_hierarchical_retrieval
+        )
+        return self.query_routing_service.route(question) if enabled else []
     @traceable(name="Build RAG context")
     def build_context(self, chunks: List[Dict]) -> str:
         if not chunks:
@@ -191,10 +323,41 @@ Answer in French.
         self,
         question: str,
         category: Optional[str] = None,
+        use_query_rewrite: Optional[bool] = None,
+        use_query_expansion: Optional[bool] = None,
+        use_hierarchical_retrieval: Optional[bool] = None,
+        project_id: Optional[int] = None,
+        repository_id: Optional[int] = None,
+        document_id: Optional[int] = None,
+        branch: Optional[str] = None,
+        commit_sha: Optional[str] = None,
     ) -> Dict:
-        chunks = self.retrieve(
-            question=question,
-            category=category,
+        transformation = self.transform_query(
+            question,
+            use_query_rewrite=use_query_rewrite,
+            use_query_expansion=use_query_expansion,
+        )
+        retrieved_chunks = self._retrieve_fused_chunks(
+            search_queries=transformation["search_queries"],
+            categories=self.route_categories(
+                question=question,
+                category=category,
+                use_hierarchical_retrieval=use_hierarchical_retrieval,
+            ),
+            project_id=project_id,
+            repository_id=repository_id,
+            document_id=document_id,
+            branch=branch,
+            commit_sha=commit_sha,
+        )
+        chunks = (
+            self.reranker_service.rerank(
+                query=transformation["rewritten_question"],
+                retrieved_chunks=retrieved_chunks,
+                top_k=self.final_top_k,
+            )
+            if self.reranker_service is not None
+            else retrieved_chunks[: self.final_top_k]
         )
 
         context = self.build_context(chunks)
@@ -224,4 +387,8 @@ Answer in French.
             "final_top_k": self.final_top_k,
             "reranker_type": self.reranker_type,
             "framework": "langchain",
+            "rewritten_question": transformation["rewritten_question"],
+            "expanded_queries": transformation["expanded_queries"],
+            "query_rewrite_enabled": transformation["query_rewrite_enabled"],
+            "query_expansion_enabled": transformation["query_expansion_enabled"],
         }

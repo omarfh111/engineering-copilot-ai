@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1.documents import router as documents_router
+from app.api.v1.analyses import router as analyses_router
 from app.api.v1.rag import router as rag_router
 
 
@@ -44,5 +45,9 @@ app.include_router(
 )
 app.include_router(
     rag_router,
+    prefix="/api/v1",
+)
+app.include_router(
+    analyses_router,
     prefix="/api/v1",
 )

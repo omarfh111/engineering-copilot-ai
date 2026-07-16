@@ -80,6 +80,7 @@ class ChunkingService:
         document: Dict,
         category: str = "uploaded_documents",
         source_type: str = "uploaded_document",
+        scope_metadata: Optional[Dict] = None,
     ) -> List[Dict]:
         filename = document["filename"]
         extension = document["extension"]
@@ -89,6 +90,11 @@ class ChunkingService:
         file_stem = Path(filename).stem
 
         records = []
+        scope_metadata = {
+            key: value
+            for key, value in (scope_metadata or {}).items()
+            if value is not None
+        }
 
         for page in document["pages"]:
             page_number = page["page_number"]
@@ -116,7 +122,9 @@ class ChunkingService:
                             "chunk_overlap": self.chunk_overlap,
                             "source": source,
                             "page_number": page_number,
+                            **scope_metadata,
                         },
+                        **scope_metadata,
                     }
                 )
 

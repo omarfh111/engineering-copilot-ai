@@ -58,6 +58,8 @@ class DocumentIngestionService:
         recreate_collection: bool = False,
         batch_size: int = 32,
         max_chunks: Optional[int] = None,
+        project_id: Optional[int] = None,
+        document_id: Optional[int] = None,
     ) -> Dict:
         logger.info(f"Starting document ingestion | file={file_path}")
 
@@ -67,6 +69,10 @@ class DocumentIngestionService:
             document=document,
             category=category,
             source_type=source_type,
+            scope_metadata={
+                "project_id": project_id,
+                "document_id": document_id,
+            },
         )
 
         if max_chunks is not None:
