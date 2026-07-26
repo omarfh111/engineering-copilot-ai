@@ -27,6 +27,7 @@ export interface Review {
   comment: string | null;
   score: number | null;
   status: ReviewStatus;
+  findingKey?: string | null;
   analysis: ReviewAnalysisSummary | null;
   project: ReviewProjectSummary | null;
   createdAt: string;
@@ -50,6 +51,7 @@ export interface CreateReviewPayload {
   score: number;
   status?: ReviewStatus;
   analysisId: number;
+  findingKey?: string;
 }
 
 export interface UpdateReviewPayload {
@@ -58,4 +60,5 @@ export interface UpdateReviewPayload {
   score: number;
   status: ReviewStatus;
   analysisId: number;
+  findingKey?: string;
 }

@@ -13,7 +13,7 @@ import { DocumentTable } from '../components/document/DocumentTable';
 import { useSession } from '../context/SessionContext';
 import { useToast } from '../context/ToastContext';
 import { useDebounce } from '../hooks/useDebounce';
-import { getApiErrorMessage, resolveFileUrl } from '../lib/api';
+import { getApiErrorMessage } from '../lib/api';
 import { documentTypeOptions, formatDocumentType } from '../lib/document';
 import { adminDocumentService } from '../services/adminDocumentService';
 import { adminProjectService } from '../services/adminProjectService';
@@ -199,15 +199,7 @@ export function DocumentsPage() {
   };
 
   const openDocumentPath = (document: SourceDocument) => {
-    if (!document.path) {
-      return;
-    }
-
-    const fileUrl = resolveFileUrl(document.path);
-
-    if (fileUrl) {
-      window.open(fileUrl, '_blank', 'noopener,noreferrer');
-    }
+    navigate(`/dashboard/documents/${document.id}`);
   };
 
   const pdfDocuments = documentPage?.content.filter((document) => document.type === 'PDF').length ?? 0;

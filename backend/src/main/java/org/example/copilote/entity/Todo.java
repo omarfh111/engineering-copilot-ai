@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "todos")
+@Table(name = "todos", uniqueConstraints = @UniqueConstraint(columnNames = "origin_finding_id"))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -41,6 +41,11 @@ public class Todo {
     @ManyToOne
     @JoinColumn(name = "analysis_id")
     private Analysis analysis;
+
+    /** Makes confirmation idempotent and preserves the finding that caused this TODO. */
+    @ManyToOne
+    @JoinColumn(name = "origin_finding_id")
+    private AnalysisFinding originFinding;
 
     @Column(updatable = false)
     private LocalDateTime createdAt;

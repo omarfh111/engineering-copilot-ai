@@ -9,7 +9,9 @@ import org.example.copilote.dto.Response.AnalysisSummaryResponse;
 import org.example.copilote.dto.Response.PagedResponse;
 import org.example.copilote.dto.Response.ProjectSummaryResponse;
 import org.example.copilote.dto.Response.ReviewResponse;
+import org.example.copilote.dto.Response.UserSummaryResponse;
 import org.example.copilote.entity.Analysis;
+import org.example.copilote.entity.AnalysisFinding;
 import org.example.copilote.entity.Project;
 import org.example.copilote.entity.Review;
 import org.example.copilote.entity.ReviewStatus;
@@ -17,6 +19,7 @@ import org.example.copilote.entity.Role;
 import org.example.copilote.entity.User;
 import org.example.copilote.exception.ResourceNotFoundException;
 import org.example.copilote.repository.AnalysisRepository;
+import org.example.copilote.repository.AnalysisFindingRepository;
 import org.example.copilote.repository.ProjectRepository;
 import org.example.copilote.repository.ReviewRepository;
 import org.example.copilote.security.CurrentUserProvider;
@@ -51,6 +54,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final AnalysisRepository analysisRepository;
+    private final AnalysisFindingRepository analysisFindingRepository;
     private final ProjectRepository projectRepository;
     private final CurrentUserProvider currentUserProvider;
 
@@ -77,13 +81,22 @@ public class ReviewServiceImpl implements ReviewService {
         Analysis analysis = findAnalysisById(request.getAnalysisId());
         ensureCanManageReview(currentUser, analysis.getProject());
 
-        Review review = Review.builder()
-                .reviewer(safeTrim(request.getReviewer()))
-                .comment(safeTrim(request.getComment()))
-                .score(request.getScore())
-                .status(request.getStatus() == null ? ReviewStatus.PENDING : request.getStatus())
-                .analysis(analysis)
-                .build();
+        String findingKey = safeTrim(request.getFindingKey());
+        AnalysisFinding finding = resolveFinding(analysis.getAnalysisId(), findingKey);
+        ReviewStatus status = request.getStatus() == null ? ReviewStatus.PENDING : request.getStatus();
+        ensureDecisionHasComment(status, request.getComment());
+        Review review = findingKey == null
+                ? Review.builder().analysis(analysis).build()
+                : reviewRepository.findByAnalysisAnalysisIdAndFindingKey(analysis.getAnalysisId(), findingKey)
+                .orElseGet(() -> Review.builder().analysis(analysis).findingKey(findingKey).build());
+        review.setReviewer(reviewerIdentity(currentUser));
+        review.setComment(safeTrim(request.getComment()));
+        review.setScore(request.getScore());
+        review.setStatus(status);
+        review.setFindingKey(findingKey);
+        review.setFinding(finding);
+        review.setReviewerUser(currentUser);
+        review.setAnalysis(analysis);
 
         return mapToResponse(reviewRepository.save(review));
     }
@@ -109,10 +122,13 @@ public class ReviewServiceImpl implements ReviewService {
 
         ensureCanUpdateReview(currentUser, review, analysis.getProject());
 
-        review.setReviewer(safeTrim(request.getReviewer()));
+        String findingKey = safeTrim(request.getFindingKey());
+        ensureDecisionHasComment(request.getStatus(), request.getComment());
+        review.setFinding(resolveFinding(analysis.getAnalysisId(), findingKey));
         review.setComment(safeTrim(request.getComment()));
         review.setScore(request.getScore());
         review.setStatus(request.getStatus());
+        review.setFindingKey(findingKey);
         review.setAnalysis(analysis);
 
         return mapToResponse(reviewRepository.save(review));
@@ -275,6 +291,27 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new ResourceNotFoundException("Analysis record not found with id: " + id));
     }
 
+    private void ensureDecisionHasComment(ReviewStatus status, String comment) {
+        if ((status == ReviewStatus.ACCEPTED || status == ReviewStatus.REJECTED)
+                && !StringUtils.hasText(comment)) {
+            throw new IllegalArgumentException("A review comment is required when accepting or rejecting a finding");
+        }
+    }
+
+    private AnalysisFinding resolveFinding(Long analysisId, String findingKey) {
+        if (findingKey == null) {
+            return null;
+        }
+        return analysisFindingRepository.findByAnalysisAnalysisId(analysisId).stream()
+                .filter(finding -> findingKey.equals(finding.getFindingKey()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Finding not found for this analysis"));
+    }
+
+    private String reviewerIdentity(User user) {
+        return StringUtils.hasText(user.getUsername()) ? user.getUsername().trim() : user.getEmail();
+    }
+
     private Project findProjectById(Long id) {
         return projectRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id));
@@ -315,9 +352,11 @@ public class ReviewServiceImpl implements ReviewService {
                 .id(review.getReviewId())
                 .reviewId(review.getReviewId())
                 .reviewer(review.getReviewer())
+                .reviewerUser(mapUserSummary(review.getReviewerUser()))
                 .comment(review.getComment())
                 .score(review.getScore())
                 .status(review.getStatus())
+                .findingKey(review.getFindingKey())
                 .analysis(mapAnalysisSummary(review.getAnalysis()))
                 .project(mapProjectSummary(getProject(review)))
                 .createdAt(review.getCreatedAt())
@@ -358,6 +397,12 @@ public class ReviewServiceImpl implements ReviewService {
                 .description(project.getDescription())
                 .status(project.getStatus() == null ? null : project.getStatus().name())
                 .build();
+    }
+
+    private UserSummaryResponse mapUserSummary(User user) {
+        if (user == null) return null;
+        return UserSummaryResponse.builder().id(user.getId()).firstName(user.getFirstName())
+                .lastName(user.getLastName()).username(user.getUsername()).email(user.getEmail()).role(user.getRole()).build();
     }
 
     private String safeTrim(String value) {

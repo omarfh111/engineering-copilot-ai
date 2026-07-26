@@ -29,7 +29,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/assistant")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class AssistantController {
 
     private final AssistantService assistantService;

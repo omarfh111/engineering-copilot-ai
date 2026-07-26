@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecificationExecutor<Review> {
@@ -24,4 +25,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long>, JpaSpecif
     List<Review> findByAnalysisAnalysisId(Long analysisId);
 
     List<Review> findByAnalysisProjectProjectId(Long projectId);
+
+    Optional<Review> findByAnalysisAnalysisIdAndFindingKey(Long analysisId, String findingKey);
+
+    boolean existsByAnalysisAnalysisIdAndFindingKeyAndStatus(Long analysisId, String findingKey, ReviewStatus status);
 }

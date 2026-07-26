@@ -154,16 +154,18 @@ agents `structure`, `context`, `architecture`, `quality` et `security` peuvent
 être lancés pour un audit de dépôt. `impact` exige une demande de modification
 et des chemins, `documentation` génère une fiche depuis le code et les
 manifests, et `todo` exige des constats approuvés par une revue humaine. Leur
-connexion au workflow Spring Boot reste reportée à l'étape d'intégration.
+connexion au workflow Spring Boot est réalisée pour l'audit fondation : Spring
+crée un `Analysis(FULL_AUDIT, RUNNING)`, transmet uniquement le scope de dépôt
+au endpoint FastAPI interne, puis persiste la synthèse et les résultats
+structurés. React permet de lancer le run et de consulter le résultat par agent.
 
 ### Règle de priorité confirmée
 
-L'intégration complète SAE–IA (appel Spring Boot, persistance `Analysis`,
-affichage React et création de TODO) est réalisée **après** l'implémentation et
-la validation de tous les agents. Une route IA interne peut exister pour les
-tests de contrat, mais elle ne doit pas encore être reliée à l'interface ou aux
-entités métier tant que les agents `impact`, `documentation` et `todo` ne sont
-pas prêts.
+L'intégration SAE–IA de l'audit fondation est réalisée après la validation des
+agents. Elle est asynchrone, conserve un `correlationId`, reste limitée au
+dépôt sélectionné et ne crée aucune TODO automatiquement. Les agents `impact`,
+`documentation` et `todo` gardent leurs préconditions spécifiques (demande de
+changement ou constats revus) avant leur branchement dans le workflow public.
 
 ### Architecture générée et conformité
 

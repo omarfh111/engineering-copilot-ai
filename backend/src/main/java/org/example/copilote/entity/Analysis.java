@@ -48,9 +48,24 @@ public class Analysis {
     @JoinColumn(name = "project_id")
     private Project project;
 
+    /** Repository analysed during a Sprint 3 run; null for legacy manual analyses. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "repo_id")
+    private Repository repository;
+
+    /** Stable identifier shared by Spring logs and the FastAPI agent execution. */
+    @Column(name = "correlation_id", length = 128)
+    private String correlationId;
+
+    /** JSON returned by the IA agents. Spring owns its persistence and access control. */
+    @Column(name = "agent_results_json", columnDefinition = "TEXT")
+    private String agentResultsJson;
+
+    @Builder.Default
     @OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Todo> todos = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "analysis", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 

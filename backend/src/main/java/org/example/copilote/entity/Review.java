@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews", uniqueConstraints = @UniqueConstraint(columnNames = {"analysis_id", "finding_key"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,6 +30,20 @@ public class Review {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ReviewStatus status;
+
+    /** Optional stable key of the individual IA finding being reviewed. */
+    @Column(name = "finding_key", length = 180)
+    private String findingKey;
+
+    /** Referential link used by human-in-the-loop actions; findingKey remains a readable external identifier. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "finding_id")
+    private AnalysisFinding finding;
+
+    /** Immutable authenticated author of the decision. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reviewer_user_id")
+    private User reviewerUser;
 
     @ManyToOne
     @JoinColumn(name = "analysis_id")

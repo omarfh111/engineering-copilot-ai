@@ -2,7 +2,7 @@
 
 Plateforme en cours de développement pour l'analyse, l'audit et la documentation de projets logiciels. Le dépôt rassemble les deux périmètres du binôme : le socle applicatif **SAE** et le microservice **IA**.
 
-> Statut : Sprint 2 consolidé. Les fonctions IA multi-agents, l'audit automatique et la QA avancée appartiennent au Sprint 3 et restent marquées **en cours**.
+> Statut : Sprint 2 consolidé. Le socle Sprint 3 est intégré : audit multi-agents, revue humaine par finding, impact à la demande, proposition TODO via IA et publication contrôlée de feedback projet sont disponibles. Les écritures métier restent toujours explicites et confirmées par un humain.
 
 ## Architecture
 
@@ -35,7 +35,7 @@ engineering-copilot-ai/
 
 1. Copier `backend/.env.example` vers `backend/.env`.
 2. Copier `ai-service/.env.example` vers `ai-service/.env`.
-3. Définir la même valeur longue pour `AI_INTERNAL_API_KEY` dans les deux fichiers, puis renseigner `OPENAI_API_KEY` et Qdrant si nécessaire.
+3. Définir la même valeur longue pour `AI_INTERNAL_API_KEY` dans les deux fichiers, renseigner `APP_CORS_ALLOWED_ORIGINS` côté backend, puis renseigner `OPENAI_API_KEY` et Qdrant si nécessaire.
 4. Lancer PostgreSQL et Qdrant : `docker compose -f infra/docker-compose.yml up -d` depuis la racine.
 5. Lancer FastAPI, puis Spring Boot, puis React. Les détails sont dans les README des sous-projets.
 
@@ -46,8 +46,11 @@ Ne versionnez jamais les deux fichiers `.env`, les mots de passe ou les clés AP
 - [Validation Sprint 2](docs/SPRINT2_ACCEPTANCE.md)
 - [Backlog QA et Sprint 3](docs/SPRINT3_QA_BACKLOG.md)
 - [Contrat backend - IA](backend/docs/ROUTAGE_SAE_IA.md)
+- [Migration PostgreSQL Sprint 3](backend/docs/migrations/README.md)
 - [Expérimentations et évaluations IA](ai-service/docs/EXPERIMENTATIONS_ET_EVALUATIONS.md)
 - [Guide IA existant](ai-service/docs/GUIDE_CODEBASE.md)
+- [Architecture et intégration des agents Sprint 3](docs/SPRINT3_AGENT_ARCHITECTURE.md)
+- [Plan de test d'intégration Sprint 3](docs/SPRINT3_TEST_PLAN.md)
 
 ## Répartition Sprint 2
 

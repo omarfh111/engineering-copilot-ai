@@ -18,11 +18,15 @@ public class ReviewResponse {
 
     private String reviewer;
 
+    private UserSummaryResponse reviewerUser;
+
     private String comment;
 
     private Double score;
 
     private ReviewStatus status;
+
+    private String findingKey;
 
     private AnalysisSummaryResponse analysis;
 

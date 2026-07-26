@@ -6,6 +6,7 @@ import org.example.copilote.dto.Request.CreateDocumentRequest;
 import org.example.copilote.dto.Request.DocumentSearchRequest;
 import org.example.copilote.dto.Request.UpdateDocumentRequest;
 import org.example.copilote.dto.Response.DocumentResponse;
+import org.example.copilote.dto.Response.DocumentFileResponse;
 import org.example.copilote.dto.Response.PagedResponse;
 import org.example.copilote.dto.Response.ProjectSummaryResponse;
 import org.example.copilote.client.AiRagClient;
@@ -186,6 +187,35 @@ public class DocumentServiceImpl implements DocumentService {
         }
 
         return mapToResponse(document);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DocumentFileResponse getDocumentFile(Long id) {
+        User currentUser = currentUserProvider.getCurrentUser();
+        Document document = findDocumentById(id);
+        if (!canAccessProject(currentUser, document.getProject())) {
+            throw new AccessDeniedException("You are not allowed to access this document");
+        }
+        if (!StringUtils.hasText(document.getPath())) {
+            throw new ResourceNotFoundException("This document has no stored file");
+        }
+
+        try {
+            Path root = Path.of(documentStorageLocation).toAbsolutePath().normalize();
+            Path target = root.resolve(document.getPath()).normalize();
+            if (!target.startsWith(root) || !Files.isRegularFile(target)) {
+                throw new ResourceNotFoundException("The stored document file was not found");
+            }
+            String contentType = Files.probeContentType(target);
+            return new DocumentFileResponse(
+                    Files.readAllBytes(target),
+                    target.getFileName().toString(),
+                    contentType == null ? "application/octet-stream" : contentType
+            );
+        } catch (IOException exception) {
+            throw new IllegalStateException("The stored document file could not be read", exception);
+        }
     }
 
     @Override

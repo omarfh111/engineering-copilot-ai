@@ -172,3 +172,4 @@ class AgentResult(BaseModel):
     impact: Optional[ImpactAssessment] = None
     documentation: Optional[GeneratedDocumentation] = None
     todo_proposals: List[TodoProposal] = Field(default_factory=list)
+    duration_ms: Optional[int] = Field(default=None, ge=0)

@@ -47,6 +47,7 @@ type ApiReview = Omit<Review, 'analysis' | 'project' | 'status' | 'score'> & {
   projectTitle?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  findingKey?: string | null;
 };
 
 function normalizeAnalysis(review: ApiReview): ReviewAnalysisSummary | null {
@@ -94,6 +95,7 @@ function normalizeReview(review: ApiReview): Review {
     comment: review.comment ?? null,
     score: review.score === null || review.score === undefined ? null : Number(review.score),
     status: (review.status ?? 'PENDING') as ReviewStatus,
+    findingKey: review.findingKey ?? null,
     analysis: normalizeAnalysis(review),
     project: normalizeProject(review),
     createdAt: String(review.createdAt ?? ''),
@@ -124,6 +126,11 @@ export const adminReviewService = {
 
   async getReviewsByProjectId(projectId: number) {
     const response = await apiClient.get<ApiReview[]>(`/api/reviews/project/${projectId}`);
+    return response.data.map(normalizeReview);
+  },
+
+  async getReviewsByAnalysisId(analysisId: number) {
+    const response = await apiClient.get<ApiReview[]>(`/api/reviews/analysis/${analysisId}`);
     return response.data.map(normalizeReview);
   },
 

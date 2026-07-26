@@ -2,7 +2,6 @@ package org.example.copilote.dto.Request;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -13,7 +12,7 @@ import org.example.copilote.entity.ReviewStatus;
 @Setter
 public class UpdateReviewRequest {
 
-    @NotBlank(message = "Reviewer is required")
+    /** Ignored by the server: a review keeps its original authenticated author. */
     @Size(max = 150, message = "Reviewer must be less than or equal to 150 characters")
     private String reviewer;
 
@@ -30,4 +29,7 @@ public class UpdateReviewRequest {
 
     @NotNull(message = "Analysis is required")
     private Long analysisId;
+
+    @Size(max = 180, message = "Finding key must be 180 characters or fewer")
+    private String findingKey;
 }

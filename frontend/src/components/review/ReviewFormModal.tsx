@@ -102,7 +102,9 @@ export function ReviewFormModal({
           className="space-y-6 px-6 py-6 sm:px-7"
           onSubmit={handleSubmit((values) => {
             onSubmit({
-              reviewer: values.reviewer.trim(),
+              // Spring records the authenticated user; the browser must not be
+              // able to choose or impersonate a reviewer.
+              reviewer: '',
               comment: values.comment.trim(),
               score: Number(values.score),
               status: values.status as ReviewStatus,
@@ -111,18 +113,7 @@ export function ReviewFormModal({
           })}
         >
           <div className="grid gap-5">
-            <label className="space-y-2">
-              <span className="text-sm font-medium text-slate-200">Reviewer</span>
-              <input
-                className="w-full rounded-2xl border border-white/10 bg-slate-950/75 px-4 py-3 text-white outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-500/10"
-                {...register('reviewer', {
-                  required: 'Reviewer is required',
-                  maxLength: { value: 150, message: 'Reviewer must be 150 characters or fewer' },
-                  validate: (value) => (value.trim() ? true : 'Reviewer is required')
-                })}
-              />
-              {errors.reviewer ? <p className="text-sm text-rose-300">{errors.reviewer.message}</p> : null}
-            </label>
+            <p className="rounded-2xl border border-brand-400/20 bg-brand-500/5 p-4 text-sm text-slate-300">The reviewer identity is recorded from the authenticated account.</p>
 
             <div className="grid gap-5 md:grid-cols-3">
               <label className="space-y-2">

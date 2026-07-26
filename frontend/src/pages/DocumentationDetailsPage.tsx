@@ -32,7 +32,12 @@ export function DocumentationDetailsPage() {
   const documentationId = Number(id);
   const canManageDocumentation = currentUser?.role === 'ADMIN' || currentUser?.role === 'ARCHITECT';
   const canDeleteDocumentation = currentUser?.role === 'ADMIN';
-  const fileUrl = useMemo(() => resolveFileUrl(documentation?.path), [documentation?.path]);
+  const fileUrl = useMemo(() => {
+    if (documentation?.content) {
+      return `data:text/markdown;charset=utf-8,${encodeURIComponent(documentation.content)}`;
+    }
+    return resolveFileUrl(documentation?.path);
+  }, [documentation?.content, documentation?.path]);
   const localFile = useMemo(() => getLocalFileReference(documentation?.path), [documentation?.path]);
   const fileType = localFile?.type ?? '';
   const isImagePreview = fileType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(documentation?.path ?? '');

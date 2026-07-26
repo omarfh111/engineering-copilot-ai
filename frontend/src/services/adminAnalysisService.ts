@@ -1,11 +1,15 @@
 import { apiClient } from '../lib/api';
 import type {
   Analysis,
+  AnalysisFinding,
+  TodoProposal,
   AnalysisProjectSummary,
   AnalysisQueryParams,
   AnalysisStatus,
   AnalysisType,
   CreateAnalysisPayload,
+  RunAnalysisPayload,
+  ImpactAnalysisPayload,
   Severity,
   UpdateAnalysisPayload
 } from '../types/analysis';
@@ -39,6 +43,9 @@ type ApiAnalysis = Omit<Analysis, 'project' | 'analysisType' | 'status' | 'sever
   projectTitle?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  repository?: Analysis['repository'];
+  correlationId?: string | null;
+  agentResults?: Record<string, unknown> | null;
 };
 
 function normalizeProject(project: ApiAnalysis['project'], analysis: ApiAnalysis): AnalysisProjectSummary {
@@ -63,6 +70,9 @@ function normalizeAnalysis(analysis: ApiAnalysis): Analysis {
     severity: (analysis.severity ?? 'MEDIUM') as Severity,
     score: analysis.score === null || analysis.score === undefined ? null : Number(analysis.score),
     project: normalizeProject(analysis.project, analysis),
+    repository: analysis.repository ?? null,
+    correlationId: analysis.correlationId ?? null,
+    agentResults: analysis.agentResults ?? null,
     createdAt: String(analysis.createdAt ?? ''),
     updatedAt: String(analysis.updatedAt ?? analysis.createdAt ?? '')
   };
@@ -96,6 +106,36 @@ export const adminAnalysisService = {
 
   async createAnalysis(payload: CreateAnalysisPayload) {
     const response = await apiClient.post<ApiAnalysis>('/api/analyses', payload);
+    return normalizeAnalysis(response.data);
+  },
+
+  async getFindings(analysisId: number) {
+    const response = await apiClient.get<AnalysisFinding[]>(`/api/analyses/${analysisId}/findings`);
+    return response.data;
+  },
+
+  async getTodoProposals(analysisId: number) {
+    const response = await apiClient.get<TodoProposal[]>(`/api/analyses/${analysisId}/todo-proposals`);
+    return response.data;
+  },
+
+  async confirmTodoProposals(analysisId: number, proposalIds: number[]) {
+    const response = await apiClient.post<number>(`/api/analyses/${analysisId}/todo-proposals/confirm`, { proposalIds });
+    return response.data;
+  },
+
+  async publishApprovedFeedback(analysisId: number, findingKey: string) {
+    const response = await apiClient.post<number>(`/api/analyses/${analysisId}/findings/${encodeURIComponent(findingKey)}/knowledge`);
+    return response.data;
+  },
+
+  async runAnalysis(payload: RunAnalysisPayload) {
+    const response = await apiClient.post<ApiAnalysis>('/api/analyses/run', payload);
+    return normalizeAnalysis(response.data);
+  },
+
+  async runImpactAnalysis(payload: ImpactAnalysisPayload) {
+    const response = await apiClient.post<ApiAnalysis>('/api/analyses/impact', payload);
     return normalizeAnalysis(response.data);
   },
 

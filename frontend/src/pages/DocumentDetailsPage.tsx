@@ -33,12 +33,29 @@ export function DocumentDetailsPage() {
 
   const documentId = Number(id);
   const canManageDocuments = currentUser?.role === 'ADMIN';
-  const fileUrl = useMemo(() => resolveFileUrl(sourceDocument?.path), [sourceDocument?.path]);
   const localFile = useMemo(() => getLocalFileReference(sourceDocument?.path), [sourceDocument?.path]);
+  const externalFileUrl = useMemo(() => {
+    const path = sourceDocument?.path?.trim();
+    return path && /^https?:\/\//i.test(path) ? resolveFileUrl(path) : null;
+  }, [sourceDocument?.path]);
+  const [storedFileUrl, setStoredFileUrl] = useState<string | null>(null);
+  const fileUrl = localFile?.dataUrl ?? externalFileUrl ?? storedFileUrl;
   const fileType = localFile?.type ?? '';
   const isImagePreview = fileType.startsWith('image/') || /\.(png|jpe?g|gif|webp|bmp|svg)$/i.test(sourceDocument?.path ?? '');
   const canInlinePreview = Boolean(fileUrl && (isImagePreview || fileType === 'application/pdf' || /\.pdf$/i.test(sourceDocument?.path ?? '')));
   const FileIcon = getFileIcon(sourceDocument?.path);
+
+  useEffect(() => {
+    if (!sourceDocument?.path || localFile || externalFileUrl) {
+      setStoredFileUrl(null);
+      return undefined;
+    }
+    let objectUrl: string | null = null;
+    void adminDocumentService.getStoredFileUrl(sourceDocument.id)
+      .then((url) => { objectUrl = url; setStoredFileUrl(url); })
+      .catch(() => setStoredFileUrl(null));
+    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [externalFileUrl, localFile, sourceDocument?.id, sourceDocument?.path]);
 
   const riskScore = useMemo(() => {
     if (!sourceDocument) return null;

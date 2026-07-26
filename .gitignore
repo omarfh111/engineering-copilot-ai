@@ -31,6 +31,8 @@ htmlcov/
 # Distribution
 build/
 dist/
+**/node_modules/
+**/.vite/
 *.egg-info/
 
 # Jupyter

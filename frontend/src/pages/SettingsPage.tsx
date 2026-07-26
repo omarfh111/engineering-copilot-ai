@@ -12,14 +12,19 @@ SlidersHorizontal,
 RefreshCw
 } from "lucide-react";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from "../context/ThemeContext";
 import { useSession } from "../context/SessionContext";
 import { useToast } from "../context/ToastContext";
 import { formatDate } from "../lib/formatters";
+import { apiClient } from '../lib/api';
+
+const SETTINGS_STORAGE_KEY = 'copilote_user_preferences_v1';
 
 export function SettingsPage() {
-  const { currentUser } = useSession();
+  const { currentUser, clearSession, refreshSession } = useSession();
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
   const [saving, setSaving] = useState(false);
@@ -62,15 +67,54 @@ export function SettingsPage() {
     securityAlerts: true
   });
 
-  const handleSaveProfile = async () => {
-    setSaving(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setSaving(false);
-    showToast({
-      type: 'success',
-      title: 'Profile saved',
-      description: 'Your profile has been updated successfully.'
+  useEffect(() => {
+    if (!currentUser) return;
+    setProfileSettings((current) => current.email ? current : {
+      ...current,
+      displayName: `${currentUser.firstName} ${currentUser.lastName}`.trim(),
+      email: currentUser.email
     });
+  }, [currentUser]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    if (!stored) return;
+    try {
+      const preferences = JSON.parse(stored) as Partial<typeof appearanceSettings> & {
+        profileSettings?: typeof profileSettings;
+        securitySettings?: typeof securitySettings;
+        platformPreferences?: typeof platformPreferences;
+        notificationSettings?: typeof notificationSettings;
+      };
+      if (preferences.profileSettings) setProfileSettings(preferences.profileSettings);
+      if (preferences.language && preferences.timezone) setAppearanceSettings({ language: preferences.language, timezone: preferences.timezone });
+      if (preferences.securitySettings) setSecuritySettings(preferences.securitySettings);
+      if (preferences.platformPreferences) setPlatformPreferences(preferences.platformPreferences);
+      if (preferences.notificationSettings) setNotificationSettings(preferences.notificationSettings);
+    } catch { localStorage.removeItem(SETTINGS_STORAGE_KEY); }
+  }, []);
+
+  const savePreferences = () => {
+    localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify({ profileSettings, appearanceSettings, securitySettings, platformPreferences, notificationSettings }));
+    showToast({ type: 'success', title: 'Preferences saved', description: 'Your browser preferences are stored for this workspace.' });
+  };
+
+  const handleSaveProfile = async () => {
+    if (!currentUser) return;
+    setSaving(true);
+    try {
+      const parts = profileSettings.displayName.trim().split(/\s+/).filter(Boolean);
+      await apiClient.put(`/api/users/${currentUser.id}`, {
+        firstName: parts[0] ?? currentUser.firstName,
+        lastName: parts.slice(1).join(' ') || currentUser.lastName,
+        username: currentUser.username,
+        email: profileSettings.email.trim()
+      });
+      await refreshSession();
+      showToast({ type: 'success', title: 'Profile saved', description: 'Your profile has been updated successfully.' });
+    } catch {
+      showToast({ type: 'error', title: 'Profile update failed', description: 'Check the display name and email address, then try again.' });
+    } finally { setSaving(false); }
   };
 
   const handleLanguageChange = (language: string) => {
@@ -108,11 +152,8 @@ export function SettingsPage() {
   };
 
   const handleLogout = () => {
-    showToast({
-      type: 'info',
-      title: 'Logging out',
-      description: 'You are being logged out...'
-    });
+    clearSession();
+    navigate('/login');
   };
 
   const handleDeleteAccount = () => {
@@ -406,6 +447,7 @@ export function SettingsPage() {
             />
           </label>
         </div>
+        <button className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600" onClick={savePreferences} type="button"><Save className="h-4 w-4" />Save workspace preferences</button>
       </section>
 
       {/* Notifications */}
@@ -474,6 +516,7 @@ export function SettingsPage() {
             />
           </label>
         </div>
+        <button className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-600" onClick={savePreferences} type="button"><Save className="h-4 w-4" />Save notification preferences</button>
       </section>
 
       {/* Account Information */}

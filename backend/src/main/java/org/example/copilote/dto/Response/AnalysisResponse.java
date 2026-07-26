@@ -3,6 +3,7 @@ package org.example.copilote.dto.Response;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import tools.jackson.databind.JsonNode;
 import org.example.copilote.entity.AnalysisStatus;
 import org.example.copilote.entity.AnalysisType;
 import org.example.copilote.entity.Severity;
@@ -31,6 +32,12 @@ public class AnalysisResponse {
     private Integer score;
 
     private ProjectSummaryResponse project;
+
+    private RepositorySummaryResponse repository;
+
+    private String correlationId;
+
+    private JsonNode agentResults;
 
     private LocalDateTime createdAt;
 

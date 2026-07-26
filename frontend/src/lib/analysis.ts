@@ -1,7 +1,7 @@
 import type { AnalysisStatus, AnalysisType, Severity } from '../types/analysis';
 
-export const analysisTypeOptions: AnalysisType[] = ['SECURITY', 'QUALITY', 'ARCHITECTURE', 'DOCUMENTATION', 'TODO_GENERATION'];
-export const analysisStatusOptions: AnalysisStatus[] = ['PENDING', 'RUNNING', 'COMPLETED', 'FAILED'];
+export const analysisTypeOptions: AnalysisType[] = ['FULL_AUDIT', 'IMPACT', 'SECURITY', 'QUALITY', 'ARCHITECTURE', 'DOCUMENTATION', 'TODO_GENERATION'];
+export const analysisStatusOptions: AnalysisStatus[] = ['PENDING', 'RUNNING', 'PARTIAL', 'COMPLETED', 'FAILED'];
 export const severityOptions: Severity[] = ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
 
 export function formatEnumLabel(value: string) {

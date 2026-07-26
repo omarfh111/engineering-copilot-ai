@@ -1,23 +1,32 @@
 package org.example.copilote.service.impl;
 
 import jakarta.persistence.criteria.JoinType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.example.copilote.dto.Request.RunAnalysisRequest;
+import org.example.copilote.dto.Request.ImpactAnalysisRequest;
 import org.example.copilote.dto.Request.AnalysisSearchRequest;
 import org.example.copilote.dto.Request.CreateAnalysisRequest;
 import org.example.copilote.dto.Request.UpdateAnalysisRequest;
 import org.example.copilote.dto.Response.AnalysisResponse;
 import org.example.copilote.dto.Response.PagedResponse;
 import org.example.copilote.dto.Response.ProjectSummaryResponse;
+import org.example.copilote.dto.Response.RepositorySummaryResponse;
 import org.example.copilote.entity.Analysis;
 import org.example.copilote.entity.AnalysisStatus;
 import org.example.copilote.entity.Project;
 import org.example.copilote.entity.Role;
+import org.example.copilote.entity.Repository;
+import org.example.copilote.entity.RepositoryProvider;
 import org.example.copilote.entity.Severity;
 import org.example.copilote.entity.User;
 import org.example.copilote.exception.ResourceNotFoundException;
 import org.example.copilote.repository.AnalysisRepository;
 import org.example.copilote.repository.ProjectRepository;
+import org.example.copilote.repository.RepositoryRepository;
 import org.example.copilote.security.CurrentUserProvider;
+import org.example.copilote.service.AnalysisExecutionService;
 import org.example.copilote.service.AnalysisService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +41,7 @@ import org.springframework.util.StringUtils;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +63,10 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final AnalysisRepository analysisRepository;
     private final ProjectRepository projectRepository;
+    private final RepositoryRepository repositoryRepository;
     private final CurrentUserProvider currentUserProvider;
+    private final AnalysisExecutionService analysisExecutionService;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -113,6 +126,78 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .build();
 
         return mapToResponse(analysisRepository.save(analysis));
+    }
+
+    @Override
+    public AnalysisResponse runAnalysis(RunAnalysisRequest request) {
+        User currentUser = currentUserProvider.getCurrentUser();
+        Project project = findProjectById(request.getProjectId());
+        Repository repository = findRepositoryById(request.getRepositoryId());
+
+        if (!repository.getProject().getProjectId().equals(project.getProjectId())) {
+            throw new IllegalArgumentException("The repository must belong to the selected project");
+        }
+        if (repository.getProvider() != RepositoryProvider.GITHUB) {
+            throw new IllegalArgumentException("Sprint 3 repository analysis currently supports public GitHub repositories only");
+        }
+        ensureCanRunAnalysis(currentUser, project);
+
+        String correlationId = UUID.randomUUID().toString();
+        Analysis analysis = Analysis.builder()
+                .title("Repository audit - " + repository.getName())
+                .type(org.example.copilote.entity.AnalysisType.FULL_AUDIT)
+                .status(AnalysisStatus.RUNNING)
+                .summary("Repository analysis is running.")
+                .recommendation("Results will be available when the agent run completes.")
+                .severity(Severity.LOW)
+                .score(0d)
+                .project(project)
+                .repository(repository)
+                .correlationId(correlationId)
+                .build();
+        Analysis saved = analysisRepository.save(analysis);
+
+        List<String> rules = request.getRules() == null ? List.of() : request.getRules().stream()
+                .filter(StringUtils::hasText)
+                .map(String::trim)
+                .distinct()
+                .toList();
+        String profile = safeTrim(request.getArchitectureProfile());
+        analysisExecutionService.execute(
+                saved.getAnalysisId(), project.getProjectId(), repository.getRepoId(), repository.getUrl(),
+                repository.getBranch(), currentUser.getId(), rules, profile,
+                request.isGenerateDocumentation(), correlationId
+        );
+        return mapToResponse(saved);
+    }
+
+    @Override
+    public AnalysisResponse runImpactAnalysis(ImpactAnalysisRequest request) {
+        User currentUser = currentUserProvider.getCurrentUser();
+        Project project = findProjectById(request.getProjectId());
+        Repository repository = findRepositoryById(request.getRepositoryId());
+        if (!repository.getProject().getProjectId().equals(project.getProjectId())) {
+            throw new IllegalArgumentException("The repository must belong to the selected project");
+        }
+        if (repository.getProvider() != RepositoryProvider.GITHUB) {
+            throw new IllegalArgumentException("Impact analysis currently supports public GitHub repositories only");
+        }
+        ensureCanRunAnalysis(currentUser, project);
+        String correlationId = UUID.randomUUID().toString();
+        Analysis saved = analysisRepository.save(Analysis.builder()
+                .title("Impact analysis - " + repository.getName())
+                .type(org.example.copilote.entity.AnalysisType.IMPACT)
+                .status(AnalysisStatus.RUNNING)
+                .summary("Impact analysis is running.")
+                .recommendation("Results will be available when the impact scope completes.")
+                .severity(Severity.LOW).score(0d).project(project).repository(repository)
+                .correlationId(correlationId).build());
+        List<String> paths = request.getPaths() == null ? List.of() : request.getPaths().stream()
+                .filter(StringUtils::hasText).map(String::trim).distinct().toList();
+        analysisExecutionService.executeImpact(saved.getAnalysisId(), project.getProjectId(), repository.getRepoId(),
+                repository.getUrl(), repository.getBranch(), currentUser.getId(),
+                request.getChangeDescription().trim(), paths, correlationId);
+        return mapToResponse(saved);
     }
 
     @Override
@@ -278,6 +363,24 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + id));
     }
 
+    private Repository findRepositoryById(Long id) {
+        return repositoryRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Repository not found with id: " + id));
+    }
+
+    private void ensureCanRunAnalysis(User currentUser, Project project) {
+        if (currentUserProvider.isAdmin(currentUser) || currentUserProvider.hasRole(currentUser, Role.AUDITOR)) {
+            return;
+        }
+        if ((currentUserProvider.hasRole(currentUser, Role.QA)
+                || currentUserProvider.hasRole(currentUser, Role.ARCHITECT)
+                || currentUserProvider.hasRole(currentUser, Role.DEVELOPER))
+                && canAccessProject(currentUser, project)) {
+            return;
+        }
+        throw new AccessDeniedException("You are not allowed to run analyses for this project");
+    }
+
     private boolean canAccessProject(User currentUser, Project project) {
         if (currentUserProvider.isAdmin(currentUser) || currentUserProvider.hasRole(currentUser, Role.AUDITOR)) {
             return true;
@@ -321,9 +424,42 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .status(analysis.getStatus())
                 .score(analysis.getScore() != null ? analysis.getScore().intValue() : null)
                 .project(mapProjectSummary(analysis.getProject()))
+                .repository(mapRepositorySummary(analysis.getRepository()))
+                .correlationId(analysis.getCorrelationId())
+                .agentResults(parseAgentResults(analysis.getAgentResultsJson()))
                 .createdAt(analysis.getCreatedAt())
                 .updatedAt(analysis.getUpdatedAt())
                 .build();
+    }
+
+    private RepositorySummaryResponse mapRepositorySummary(Repository repository) {
+        if (repository == null) {
+            return null;
+        }
+        return RepositorySummaryResponse.builder()
+                .id(repository.getRepoId())
+                .repoId(repository.getRepoId())
+                .name(repository.getName())
+                .url(repository.getUrl())
+                .technology(repository.getTechnology())
+                .provider(repository.getProvider())
+                .branch(repository.getBranch())
+                .projectId(repository.getProject() == null ? null : repository.getProject().getProjectId())
+                .projectTitle(repository.getProject() == null ? null : repository.getProject().getTitle())
+                .createdAt(repository.getCreatedAt())
+                .updatedAt(repository.getUpdatedAt())
+                .build();
+    }
+
+    private JsonNode parseAgentResults(String resultsJson) {
+        if (!StringUtils.hasText(resultsJson)) {
+            return null;
+        }
+        try {
+            return objectMapper.readTree(resultsJson);
+        } catch (Exception exception) {
+            return null;
+        }
     }
 
     private String resolveAnalysisTitle(Analysis analysis) {

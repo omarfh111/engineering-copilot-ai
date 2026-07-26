@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/documentation")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class DocumentationController {
 
     private final DocumentationService documentationService;

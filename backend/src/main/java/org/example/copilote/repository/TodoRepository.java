@@ -24,5 +24,7 @@ public interface TodoRepository extends JpaRepository<Todo, Long>, JpaSpecificat
 
     List<Todo> findByAnalysisAnalysisId(Long analysisId);
 
+    boolean existsByOriginFindingFindingId(Long findingId);
+
     List<Todo> findByAnalysisProjectProjectId(Long projectId);
 }

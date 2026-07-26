@@ -113,6 +113,11 @@ export const adminDocumentService = {
     return normalizeDocument(response.data);
   },
 
+  async getStoredFileUrl(id: number) {
+    const response = await apiClient.get(`/api/documents/${id}/content`, { responseType: 'blob' });
+    return URL.createObjectURL(response.data);
+  },
+
   async updateDocument(id: number, payload: UpdateDocumentPayload) {
     const response = await apiClient.put<ApiDocument>(`/api/documents/${id}`, payload);
     return normalizeDocument(response.data);

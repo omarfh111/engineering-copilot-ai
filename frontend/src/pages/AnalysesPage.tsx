@@ -2,6 +2,7 @@ import { Boxes, Filter, ShieldPlus, SlidersHorizontal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AnalysisFormModal } from '../components/analysis/AnalysisFormModal';
+import { RunAnalysisModal } from '../components/analysis/RunAnalysisModal';
 import { AnalysisTable } from '../components/analysis/AnalysisTable';
 import { DeleteAnalysisDialog } from '../components/analysis/DeleteAnalysisDialog';
 import { EmptyState } from '../components/common/EmptyState';
@@ -16,6 +17,7 @@ import { getApiErrorMessage } from '../lib/api';
 import { analysisStatusOptions, analysisTypeOptions, formatEnumLabel } from '../lib/analysis';
 import { adminAnalysisService } from '../services/adminAnalysisService';
 import { adminProjectService } from '../services/adminProjectService';
+import { adminRepositoryService } from '../services/adminRepositoryService';
 import type {
   Analysis,
   AnalysisProjectSummary,
@@ -25,6 +27,7 @@ import type {
   CreateAnalysisPayload,
   UpdateAnalysisPayload
 } from '../types/analysis';
+import type { CodeRepository } from '../types/repository';
 
 const defaultFilters: AnalysisQueryParams = {
   search: '',
@@ -44,17 +47,20 @@ export function AnalysesPage() {
   const [filters, setFilters] = useState<AnalysisQueryParams>(defaultFilters);
   const [analysisPage, setAnalysisPage] = useState<Awaited<ReturnType<typeof adminAnalysisService.getAnalyses>> | null>(null);
   const [projects, setProjects] = useState<AnalysisProjectSummary[]>([]);
+  const [repositories, setRepositories] = useState<CodeRepository[]>([]);
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAnalysis, setSelectedAnalysis] = useState<Analysis | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [runOpen, setRunOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const debouncedSearch = useDebounce(filters.search ?? '');
 
   const canManageAnalyses = currentUser?.role === 'ADMIN' || currentUser?.role === 'QA';
+  const canRunAnalyses = ['ADMIN', 'QA', 'AUDITOR', 'ARCHITECT', 'DEVELOPER'].includes(currentUser?.role ?? '');
   const canDeleteAnalyses = currentUser?.role === 'ADMIN';
 
   const loadAnalyses = async () => {
@@ -93,8 +99,11 @@ export function AnalysesPage() {
           status: project.status
         }))
       );
+      const repositoryResponse = await adminRepositoryService.getRepositories({ page: 0, size: 100, sortBy: 'name', sortDirection: 'asc' });
+      setRepositories(repositoryResponse.content);
     } catch (projectError) {
       setProjects([]);
+      setRepositories([]);
       showToast({
         type: 'error',
         title: 'Unable to load projects',
@@ -139,6 +148,20 @@ export function AnalysesPage() {
         title: 'Unable to create analysis',
         description: getApiErrorMessage(createError)
       });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleRunSubmit = async (payload: { projectId: number; repositoryId: number; architectureProfile?: 'engineering_copilot' }) => {
+    setSubmitting(true);
+    try {
+      const analysis = await adminAnalysisService.runAnalysis(payload);
+      setRunOpen(false);
+      showToast({ type: 'success', title: 'Analysis started', description: `${analysis.title} is running. Refresh shortly to see the completed results.` });
+      await loadAnalyses();
+    } catch (runError) {
+      showToast({ type: 'error', title: 'Unable to start analysis', description: getApiErrorMessage(runError) });
     } finally {
       setSubmitting(false);
     }
@@ -247,6 +270,16 @@ export function AnalysesPage() {
               >
                 <ShieldPlus className="h-4 w-4" />
                 Add Analysis
+              </button>
+            ) : null}
+            {canRunAnalyses ? (
+              <button
+                className="inline-flex items-center gap-2 rounded-2xl border border-brand-300/40 bg-brand-500/10 px-4 py-2 text-sm font-semibold text-brand-100 transition hover:bg-brand-500/20"
+                onClick={() => setRunOpen(true)}
+                type="button"
+              >
+                <ShieldPlus className="h-4 w-4" />
+                Run repository audit
               </button>
             ) : null}
           </div>
@@ -411,6 +444,17 @@ export function AnalysesPage() {
             title="Edit analysis"
           />
         </>
+      ) : null}
+
+      {canRunAnalyses ? (
+        <RunAnalysisModal
+          loading={submitting}
+          onClose={() => setRunOpen(false)}
+          onSubmit={handleRunSubmit}
+          open={runOpen}
+          projects={projects}
+          repositories={repositories}
+        />
       ) : null}
 
       {canDeleteAnalyses ? (

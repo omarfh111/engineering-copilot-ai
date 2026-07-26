@@ -35,6 +35,10 @@ public class Document {
     @Column(name = "source", length = 200)
     private String source;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "indexing_status", length = 30)
+    private DocumentIndexingStatus indexingStatus;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;

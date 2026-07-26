@@ -26,7 +26,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/repositories")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class RepositoryController {
 
     private final RepositoryService repositoryService;

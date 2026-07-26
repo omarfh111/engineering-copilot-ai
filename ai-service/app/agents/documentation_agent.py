@@ -1,23 +1,15 @@
-"""Deterministic technical-documentation generation for Sprint 3."""
+"""Evidence-based technical-documentation generation for Sprint 3."""
 
 from collections import Counter
+import re
 
 from app.agents.base import BaseAgent
-from app.schemas.agents import (
-    AgentFinding,
-    AgentInput,
-    AgentName,
-    AgentResult,
-    AgentStatus,
-    FindingSeverity,
-    FindingSource,
-    GeneratedDocumentation,
-)
+from app.schemas.agents import AgentInput, AgentName, AgentResult, AgentStatus, GeneratedDocumentation
 from app.services.github_service import GitHubRepositoryService
 
 
 class DocumentationAgent(BaseAgent):
-    """Builds a Markdown technical inventory from repository evidence only."""
+    """Creates a useful draft from repository evidence without inventing project facts."""
 
     name = AgentName.DOCUMENTATION
     SOURCE_EXTENSIONS = {".md", ".json", ".xml", ".properties", ".yml", ".yaml", ".py", ".java", ".js", ".jsx", ".ts", ".tsx"}
@@ -35,24 +27,28 @@ class DocumentationAgent(BaseAgent):
         paths = sorted(item["path"] for item in snapshot.files)
         readme_path, _ = self._readme(texts)
         top_directories = sorted({path.split("/", 1)[0] for path in paths if "/" in path})
-        extension_counts = Counter(
-            "." + path.rsplit(".", 1)[-1].casefold()
-            for path in paths if "." in path
-        )
+        extension_counts = Counter("." + path.rsplit(".", 1)[-1].casefold() for path in paths if "." in path)
         source_paths = self._source_paths(paths, readme_path)
         documentation = GeneratedDocumentation(
-            title=f"Documentation technique — {snapshot.owner}/{snapshot.name}",
-            markdown=self._markdown(snapshot, top_directories, extension_counts, source_paths),
+            title=f"Technical documentation - {snapshot.owner}/{snapshot.name}",
+            markdown=self._markdown(
+                snapshot=snapshot,
+                top_directories=top_directories,
+                extension_counts=extension_counts,
+                source_paths=source_paths,
+                technology=self._technology(paths, texts),
+                entrypoints=self._entrypoints(paths),
+                commands=self._commands(texts),
+                environment_variables=self._environment_variables(texts),
+                route_evidence=self._route_evidence(texts),
+            ),
             source_paths=source_paths,
         )
         return AgentResult(
             agent=self.name,
             status=AgentStatus.COMPLETED,
-            summary=(
-                f"Fiche technique générée à partir de {len(source_paths)} source(s) documentaire(s) "
-                f"et {len(paths)} fichier(s) du commit {snapshot.commit_sha[:12]}."
-            ),
-            findings=[],
+            summary=(f"Technical draft generated from {len(source_paths)} evidence source(s) "
+                     f"and {len(paths)} allowed file(s) at commit {snapshot.commit_sha[:12]}"),
             documentation=documentation,
         )
 
@@ -64,57 +60,79 @@ class DocumentationAgent(BaseAgent):
         return None, ""
 
     def _source_paths(self, paths: list[str], readme_path: str | None) -> list[str]:
-        manifests = [
-            path for path in paths
-            if path.rsplit("/", 1)[-1].casefold() in self.EVIDENCE_FILENAMES
-        ]
-        entrypoints = [
-            path for path in paths
-            if path.rsplit("/", 1)[-1].casefold() in {"main.py", "app.py", "application.java"}
-        ]
-        documents = [path for path in paths if path.casefold().startswith("docs/")]
-        sources = manifests + entrypoints + documents
+        manifests = [path for path in paths if path.rsplit("/", 1)[-1].casefold() in self.EVIDENCE_FILENAMES]
+        entrypoints = [path for path in paths if path.rsplit("/", 1)[-1].casefold() in {"main.py", "app.py", "application.java"}]
+        documentation = [path for path in paths if path.casefold().startswith("docs/")]
+        sources = manifests + entrypoints + documentation
         if readme_path:
             sources.append(readme_path)
         return list(dict.fromkeys(sources))[:100]
 
     @staticmethod
-    def _markdown(snapshot, top_directories, extension_counts, source_paths) -> str:
-        extensions = ", ".join(
-            f"{extension} ({count})" for extension, count in extension_counts.most_common(12)
-        ) or "non déterminées"
+    def _technology(paths: list[str], texts: dict[str, str]) -> list[str]:
+        corpus = "\n".join(texts.values()).casefold()
+        basenames = {path.rsplit("/", 1)[-1].casefold() for path in paths}
+        checks = (
+            ("React", "react" in corpus or any(path.endswith((".jsx", ".tsx")) for path in paths)),
+            ("Vite", "vite" in corpus),
+            ("Node.js", "package.json" in basenames),
+            ("Python", any(path.endswith(".py") for path in paths)),
+            ("FastAPI", "fastapi" in corpus),
+            ("Flask", "flask" in corpus),
+            ("Spring Boot", "spring-boot" in corpus),
+            ("PostgreSQL", "postgres" in corpus),
+            ("Docker", "docker" in corpus or any("docker" in path.casefold() for path in paths)),
+        )
+        return [label for label, present in checks if present]
+
+    @staticmethod
+    def _entrypoints(paths: list[str]) -> list[str]:
+        conventional_names = {"main.py", "app.py", "manage.py", "server.js", "index.js", "index.ts", "application.java", "package.json", "pom.xml"}
+        return [path for path in paths if path.rsplit("/", 1)[-1].casefold() in conventional_names][:20]
+
+    @staticmethod
+    def _commands(texts: dict[str, str]) -> list[str]:
+        pattern = re.compile(r"(?m)^\s*(?:\$\s*)?((?:npm|pnpm|yarn|python(?:3)?|uvicorn|gunicorn|mvn|\.\\?mvnw|docker(?:\s+compose)?)\b[^\r\n`]{0,180})")
+        commands = [match.group(1).strip() for text in texts.values() for match in pattern.finditer(text)]
+        return list(dict.fromkeys(commands))[:12]
+
+    @staticmethod
+    def _environment_variables(texts: dict[str, str]) -> list[str]:
+        pattern = re.compile(r"\b[A-Z][A-Z0-9_]{2,}\b")
+        variables = []
+        for path, text in texts.items():
+            filename = path.rsplit("/", 1)[-1].casefold()
+            if filename in {"readme.md", ".env.example", "example.env"} or ".env" in path.casefold() or "config" in path.casefold():
+                variables.extend(pattern.findall(text))
+        ignored = {"GET", "POST", "PUT", "DELETE", "JSON", "HTML", "HTTP", "API", "URL", "PDF", "DOCX", "SQL"}
+        return [item for item in dict.fromkeys(variables) if item not in ignored][:30]
+
+    @staticmethod
+    def _route_evidence(texts: dict[str, str]) -> list[str]:
+        tokens = ("@app.", "@router.", "@GetMapping", "@PostMapping", "@RequestMapping", "router.")
+        return [path for path, text in texts.items() if any(token in text for token in tokens)][:20]
+
+    @staticmethod
+    def _markdown(snapshot, top_directories, extension_counts, source_paths, technology, entrypoints, commands, environment_variables, route_evidence) -> str:
+        extensions = ", ".join(f"{extension} ({count})" for extension, count in extension_counts.most_common(12)) or "not detected"
         lines = [
-            f"# Documentation technique — {snapshot.owner}/{snapshot.name}",
-            "",
-            "## Périmètre analysé",
-            "",
-            f"- Branche : `{snapshot.branch}`",
-            f"- Commit : `{snapshot.commit_sha}`",
-            f"- Fichiers autorisés analysés : {len(snapshot.files)}",
-            "",
-            "## Structure observée",
-            "",
-            f"- Répertoires principaux : {', '.join(top_directories) or 'aucun'}",
-            f"- Extensions principales : {extensions}",
-            "",
-            "## Sources de preuve",
-            "",
+            f"# Technical documentation - {snapshot.owner}/{snapshot.name}", "",
+            "## Analysed scope", "",
+            f"- Branch: `{snapshot.branch}`", f"- Commit: `{snapshot.commit_sha}`", f"- Allowed files analysed: {len(snapshot.files)}", "",
+            "## Repository structure", "",
+            f"- Main directories: {', '.join(top_directories) or 'none'}", f"- Main extensions: {extensions}", "",
+            "## Detected technology", "",
+            f"- {', '.join(technology) if technology else 'No technology could be identified from the allowed files.'}", "",
+            "## Entry points and manifests", "",
         ]
-        lines.extend(f"- `{path}`" for path in source_paths) if source_paths else lines.append("- Aucun manifest ou point d'entrée reconnu ; la structure reste la source de preuve.")
-        lines.extend([
-            "",
-            "## Exploitation à compléter",
-            "",
-            "Les commandes exactes de démarrage, les variables d'environnement et les procédures de déploiement doivent être validées par le responsable du projet avant publication.",
-            "",
-            "## Notes sur le README",
-            "",
-        ])
-        lines.append("Le README, s'il est présent, est cité comme source complémentaire. Son absence n'empêche pas la génération de cette fiche.")
-        lines.extend([
-            "",
-            "## Limites",
-            "",
-            "Cette fiche est générée à partir des métadonnées et textes autorisés du dépôt. Elle ne remplace pas une revue humaine ni une documentation d'exploitation validée.",
-        ])
+        lines.extend(f"- `{path}`" for path in entrypoints) if entrypoints else lines.append("- No conventional entry point was detected.")
+        lines.extend(["", "## Observed run commands", ""])
+        lines.extend(f"- `{command}`" for command in commands) if commands else lines.append("- No executable command was found in the allowed documentation or configuration files.")
+        lines.extend(["", "## Environment variables referenced", ""])
+        lines.extend(f"- `{variable}`" for variable in environment_variables) if environment_variables else lines.append("- No environment variable was detected from the allowed configuration sources.")
+        lines.extend(["", "## API route evidence", ""])
+        lines.extend(f"- `{path}`" for path in route_evidence) if route_evidence else lines.append("- No backend route declaration was detected in the analysed files.")
+        lines.extend(["", "## Evidence sources", ""])
+        lines.extend(f"- `{path}`" for path in source_paths) if source_paths else lines.append("- No manifest or documentation source was recognised; the repository structure is the available evidence.")
+        lines.extend(["", "## Review notes", "", "This draft is generated from repository evidence only. Commands, deployment procedures and secrets must be validated by the project owner before approval."])
         return "\n".join(lines) + "\n"

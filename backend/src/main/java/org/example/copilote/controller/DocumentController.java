@@ -6,10 +6,12 @@ import org.example.copilote.dto.Request.CreateDocumentRequest;
 import org.example.copilote.dto.Request.DocumentSearchRequest;
 import org.example.copilote.dto.Request.UpdateDocumentRequest;
 import org.example.copilote.dto.Response.DocumentResponse;
+import org.example.copilote.dto.Response.DocumentFileResponse;
 import org.example.copilote.dto.Response.PagedResponse;
 import org.example.copilote.service.DocumentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +30,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/documents")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class DocumentController {
 
     private final DocumentService documentService;
@@ -57,6 +58,21 @@ public class DocumentController {
     @GetMapping("/{id}")
     public ResponseEntity<DocumentResponse> getDocumentById(@PathVariable Long id) {
         return ResponseEntity.ok(documentService.getDocumentById(id));
+    }
+
+    @GetMapping("/{id}/content")
+    public ResponseEntity<byte[]> getDocumentContent(@PathVariable Long id) {
+        DocumentFileResponse file = documentService.getDocumentFile(id);
+        MediaType mediaType;
+        try {
+            mediaType = MediaType.parseMediaType(file.contentType());
+        } catch (IllegalArgumentException ignored) {
+            mediaType = MediaType.APPLICATION_OCTET_STREAM;
+        }
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.filename().replace("\"", "") + "\"")
+                .body(file.content());
     }
 
     @PutMapping("/{id}")
