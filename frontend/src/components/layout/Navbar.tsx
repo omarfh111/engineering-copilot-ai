@@ -4,8 +4,10 @@ import { formatRole, getInitials } from '../../lib/formatters';
 import { useSession } from '../../context/SessionContext';
 import { useTheme } from '../../context/ThemeContext';
 import { resolvePageTitle } from '../../lib/workspace';
+import { getModuleTranslationKey, workspaceModules } from '../../lib/workspace';
 import type { User } from '../../types/user';
 import { NotificationCenter } from './NotificationCenter';
+import { useI18n } from '../../context/I18nContext';
 
 interface NavbarProps {
   currentUser: User;
@@ -16,14 +18,17 @@ export function Navbar({ currentUser }: NavbarProps) {
   const navigate = useNavigate();
   const { clearSession } = useSession();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useI18n();
+  const currentModule = Object.values(workspaceModules).find((module) => module.path === location.pathname);
+  const pageTitle = currentModule ? t(getModuleTranslationKey(currentModule.id)) : resolvePageTitle(location.pathname);
 
   return (
     <header className="glass-panel relative z-50 flex flex-col gap-4 rounded-[28px] px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-300">
-          Enterprise Dashboard
+          {t('app.enterpriseDashboard')}
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">{resolvePageTitle(location.pathname)}</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">{pageTitle}</h2>
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
@@ -31,7 +36,7 @@ export function Navbar({ currentUser }: NavbarProps) {
           <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm text-slate-900 outline-none transition focus:border-brand-400 focus:ring-4 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-950/70 dark:text-slate-100 dark:focus:border-brand-500 dark:focus:ring-brand-500/10"
-            placeholder="Search users, teams, repositories, analyses..."
+            placeholder={t('app.searchPlaceholder')}
             type="search"
           />
         </div>
@@ -47,9 +52,13 @@ export function Navbar({ currentUser }: NavbarProps) {
         </button>
 
         <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-950/70">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-700 text-sm font-bold text-white">
-            {getInitials(currentUser)}
-          </div>
+          {currentUser.avatarUrl ? (
+            <img className="h-11 w-11 rounded-2xl object-cover" src={currentUser.avatarUrl} alt="" />
+          ) : (
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-indigo-700 text-sm font-bold text-white">
+              {getInitials(currentUser)}
+            </div>
+          )}
           <div>
             <p className="text-sm font-semibold text-slate-900 dark:text-white">
               {currentUser.firstName} {currentUser.lastName}
@@ -75,7 +84,7 @@ export function Navbar({ currentUser }: NavbarProps) {
           type="button"
         >
           <LogOut className="h-4 w-4" />
-          Sign out
+          {t('app.signOut')}
         </button>
       </div>
     </header>

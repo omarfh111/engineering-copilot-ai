@@ -31,6 +31,9 @@ import { TodoDetailsPage } from './pages/TodoDetailsPage';
 import { UserDetailsPage } from './pages/UserDetailsPage';
 import { WorkspaceSectionPage } from './pages/WorkspaceSectionPage';
 import { SystemHealthPage } from './pages/SystemHealthPage';
+import { AuditLogsPage } from './pages/AuditLogsPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
 
 const sectionModuleIds: WorkspaceModuleId[] = [
   'settings',
@@ -57,7 +60,21 @@ function SettingsLanding() {
     return <Navigate replace to="/login" />;
   }
 
-  return <Navigate replace to={currentUser.role === 'ADMIN' ? '/dashboard/settings' : '/settings/profile'} />;
+  return <Navigate replace to="/dashboard/settings" />;
+}
+
+function DashboardLanding() {
+  const { currentUser, loading } = useSession();
+
+  if (loading) {
+    return null;
+  }
+
+  if (!currentUser) {
+    return <Navigate replace to="/login" />;
+  }
+
+  return currentUser.role === 'ADMIN' ? <AdminDashboardPage /> : <DashboardPage />;
 }
 
 function App() {
@@ -67,7 +84,7 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
 
       <Route element={<DashboardLayout />}>
-        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard" element={<DashboardLanding />} />
         <Route
           path="/dashboard/projects"
           element={
@@ -288,7 +305,17 @@ function App() {
             </RoleGuard>
           }
         />
-        <Route path="/dashboard/users/:id" element={<UserDetailsPage />} />
+        <Route
+          path="/dashboard/users/:id"
+          element={
+            <RoleGuard
+              allowedRoles={['ADMIN']}
+              description="Only Engineering Copilot administrators can manage the enterprise user directory."
+            >
+              <UserDetailsPage />
+            </RoleGuard>
+          }
+        />
         {sectionModuleIds.map((moduleId) => {
           const module = workspaceModules[moduleId];
 
@@ -301,6 +328,40 @@ function App() {
                     description={`Your role is not allowed to open the ${module.label.toLowerCase()} workspace.`}
                   >
                     <SystemHealthPage />
+                  </RoleGuard>
+                }
+                key={module.id}
+                path={module.path}
+              />
+            );
+          }
+
+          if (moduleId === 'audit') {
+            return (
+              <Route
+                element={
+                  <RoleGuard
+                    allowedRoles={module.allowedRoles}
+                    description={`Your role is not allowed to open the ${module.label.toLowerCase()} workspace.`}
+                  >
+                    <AuditLogsPage />
+                  </RoleGuard>
+                }
+                key={module.id}
+                path={module.path}
+              />
+            );
+          }
+
+          if (moduleId === 'settings') {
+            return (
+              <Route
+                element={
+                  <RoleGuard
+                    allowedRoles={module.allowedRoles}
+                    description={`Your role is not allowed to open the ${module.label.toLowerCase()} workspace.`}
+                  >
+                    <SettingsPage />
                   </RoleGuard>
                 }
                 key={module.id}
@@ -341,6 +402,7 @@ function App() {
         <Route path="/conversations" element={<Navigate replace to="/dashboard/conversations" />} />
         <Route path="/assistant" element={<Navigate replace to="/dashboard/assistant" />} />
         <Route path="/teams" element={<Navigate replace to="/dashboard/teams" />} />
+        <Route path="/admin" element={<Navigate replace to="/dashboard" />} />
         <Route path="/reports" element={<Navigate replace to="/dashboard/reports" />} />
         <Route path="/sprint" element={<Navigate replace to="/dashboard/sprint" />} />
         <Route path="/architecture" element={<Navigate replace to="/dashboard/architecture" />} />
@@ -354,6 +416,7 @@ function App() {
         <Route path="/profile" element={<Navigate to="/settings/profile" replace />} />
         <Route path="/profile/edit" element={<Navigate to="/settings/profile/edit" replace />} />
         <Route path="/health" element={<Navigate replace to="/dashboard/system-health" />} />
+        <Route path="/system-health" element={<Navigate replace to="/dashboard/system-health" />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
     </Routes>

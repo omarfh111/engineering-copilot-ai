@@ -117,11 +117,21 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers("/api/users/me").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/users/*").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/users/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/me/password").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*/password").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/*").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*").hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/api/dashboard/**")
                         .hasAnyRole("ADMIN", "MANAGER", "ARCHITECT", "QA", "DEVELOPER", "AUDITOR")
+
+                        .requestMatchers(HttpMethod.GET, "/api/health")
+                        .authenticated()
+
+                        .requestMatchers(HttpMethod.POST, "/api/notifications/email")
+                        .authenticated()
 
                         .requestMatchers("/api/teams/**")
                         .hasRole("ADMIN")
@@ -192,6 +202,11 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/assistant/**")
                         .hasAnyRole("ADMIN", "DEVELOPER")
+
+                        .requestMatchers(HttpMethod.GET, "/api/audit/logs")
+                        .authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/audit/events")
+                        .authenticated()
 
                         .requestMatchers(HttpMethod.GET, "/api/documentation/**")
                         .hasAnyRole("ADMIN", "MANAGER", "ARCHITECT", "QA", "DEVELOPER", "AUDITOR")

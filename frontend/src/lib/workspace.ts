@@ -288,12 +288,12 @@ export const workspaceModules: Record<WorkspaceModuleId, WorkspaceModuleDefiniti
     icon: Wrench,
     allowedRoles: ['ADMIN'],
     kicker: 'Platform controls',
-    headline: 'Configure enterprise settings',
-    description: 'Adjust administrator-facing platform settings, governance defaults, and operational guardrails.',
+    headline: 'Configure user settings',
+    description: 'Manage profile, appearance, notifications, and account preferences for workspace users.',
     capabilities: {
-      ADMIN: ['Manage platform settings', 'Review workspace governance defaults']
+      ADMIN: ['Manage profile settings', 'Review workspace governance defaults', 'Reset user passwords']
     },
-    boundaries: ['Platform settings are reserved for administrators.']
+    boundaries: ['Settings are reserved for platform administrators.']
   },
   audit: {
     id: 'audit',
@@ -531,4 +531,34 @@ export function resolvePageTitle(pathname: string) {
 
   const moduleEntry = Object.values(workspaceModules).find((module) => module.path === pathname);
   return moduleEntry?.label ?? 'Engineering Copilot';
+}
+
+export function getModuleTranslationKey(moduleId: WorkspaceModuleId) {
+  const keys: Record<WorkspaceModuleId, string> = {
+    dashboard: 'nav.dashboard',
+    users: 'nav.users',
+    teams: 'nav.teams',
+    projects: 'nav.projects',
+    repositories: 'nav.repositories',
+    documents: 'nav.documents',
+    documentation: 'nav.documentation',
+    analyses: 'nav.analyses',
+    reviews: 'nav.reviews',
+    todos: 'nav.todos',
+    conversations: 'nav.conversations',
+    assistant: 'nav.assistant',
+    settings: 'nav.settings',
+    audit: 'nav.audit',
+    'system-health': 'nav.systemHealth',
+    reports: 'nav.reports',
+    sprint: 'nav.sprint',
+    architecture: 'nav.architecture',
+    dependencies: 'nav.dependencies',
+    impact: 'nav.impact',
+    quality: 'nav.quality',
+    security: 'nav.security',
+    'my-todos': 'nav.myTodos'
+  };
+
+  return keys[moduleId];
 }

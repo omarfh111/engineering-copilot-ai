@@ -1,60 +1,91 @@
 import { Download, FileText, Filter, Search, ShieldEllipsis, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { StatusBadge } from '../components/common/StatusBadge';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { formatDate } from '../lib/formatters';
-import { platformMockService, type AuditLogEntry } from '../services/platformMockService';
+import { auditLogService, type AuditLogEntry, type AuditLogStatus } from '../services/auditLogService';
 
-function exportCsv(logs: AuditLogEntry[]) {
-  const rows = [
-    ['Timestamp', 'Actor Email', 'Action', 'IP Address', 'Status'],
-    ...logs.map((log) => [log.timestamp, log.actor, log.action, log.ipAddress, log.status])
-  ];
-  const csv = rows.map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(',')).join('\n');
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+type ActionFilter = 'ALL' | 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN' | 'EXPORT' | 'SETTINGS';
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;
-  anchor.download = 'engineering-copilot-audit.csv';
+  anchor.download = filename;
   anchor.click();
   URL.revokeObjectURL(url);
 }
 
+function buildCsv(logs: AuditLogEntry[]) {
+  const rows = [
+    ['Timestamp', 'Actor Email', 'Action', 'IP Address', 'Status'],
+    ...logs.map((log) => [log.timestamp, log.actor, log.action, log.ipAddress, log.status])
+  ];
+
+  return rows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n');
+}
+
+function escapePdfText(value: string) {
+  return value.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+}
+
+function exportPdf(logs: AuditLogEntry[]) {
+  const lines = [
+    'Engineering Copilot Audit Logs',
+    `Generated: ${new Date().toLocaleString()}`,
+    '',
+    ...logs.slice(0, 45).map((log) =>
+      `${formatDate(log.timestamp)} | ${log.status} | ${log.actor} | ${log.action} | ${log.ipAddress}`
+    )
+  ];
+  const content = lines.map((line, index) => `BT /F1 9 Tf 40 ${760 - index * 15} Td (${escapePdfText(line.slice(0, 120))}) Tj ET`).join('\n');
+  const objects = [
+    '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
+    '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
+    '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj',
+    '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
+    `5 0 obj << /Length ${content.length} >> stream\n${content}\nendstream endobj`
+  ];
+  const body = objects.join('\n');
+  const pdf = `%PDF-1.4\n${body}\ntrailer << /Root 1 0 R >>\n%%EOF`;
+  downloadBlob(new Blob([pdf], { type: 'application/pdf' }), 'engineering-copilot-audit.pdf');
+}
+
 export function AuditLogsPage() {
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
-  const [filteredLogs, setFilteredLogs] = useState<AuditLogEntry[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'ALL' | 'SUCCESS' | 'FAILURE'>('ALL');
-  const [actionFilter, setActionFilter] = useState<'ALL' | 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | AuditLogStatus>('ALL');
+  const [actionFilter, setActionFilter] = useState<ActionFilter>('ALL');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    void platformMockService.getAuditLogs().then(setLogs);
-  }, []);
+    let active = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const page = await auditLogService.getAuditLogs({
+          page: 0,
+          size: 100,
+          sortBy: 'timestamp',
+          sortDirection: 'desc',
+          search: searchTerm,
+          status: statusFilter === 'ALL' ? '' : statusFilter,
+          action: actionFilter === 'ALL' ? '' : actionFilter
+        });
+        if (active) setLogs(page.content);
+      } catch {
+        if (active) setLogs([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
 
-  useEffect(() => {
-    let filtered = logs;
-
-    // Apply search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (log) =>
-          log.actor.toLowerCase().includes(term) ||
-          log.action.toLowerCase().includes(term) ||
-          log.ipAddress.toLowerCase().includes(term)
-      );
-    }
-
-    // Apply status filter
-    if (statusFilter !== 'ALL') {
-      filtered = filtered.filter((log) => log.status === statusFilter);
-    }
-
-    // Apply action filter
-    if (actionFilter !== 'ALL') {
-      filtered = filtered.filter((log) => log.action.toUpperCase().includes(actionFilter));
-    }
-
-    setFilteredLogs(filtered);
-  }, [logs, searchTerm, statusFilter, actionFilter]);
+    const debounce = window.setTimeout(() => void load(), 250);
+    return () => {
+      active = false;
+      window.clearTimeout(debounce);
+    };
+  }, [searchTerm, statusFilter, actionFilter]);
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -62,9 +93,20 @@ export function AuditLogsPage() {
     setActionFilter('ALL');
   };
 
+  const filteredLogs = logs;
   const successCount = filteredLogs.filter((log) => log.status === 'SUCCESS').length;
   const failureCount = filteredLogs.filter((log) => log.status === 'FAILURE').length;
   const successRate = filteredLogs.length > 0 ? ((successCount / filteredLogs.length) * 100).toFixed(1) : '0';
+
+  const handleExportCsv = async () => {
+    downloadBlob(new Blob([buildCsv(filteredLogs)], { type: 'text/csv;charset=utf-8' }), 'engineering-copilot-audit.csv');
+    await auditLogService.recordEvent('Exported audit CSV').catch(() => undefined);
+  };
+
+  const handleExportPdf = async () => {
+    exportPdf(filteredLogs);
+    await auditLogService.recordEvent('Exported audit PDF').catch(() => undefined);
+  };
 
   return (
     <div className="space-y-6">
@@ -96,11 +138,11 @@ export function AuditLogsPage() {
             <h2 className="text-2xl font-semibold text-slate-950 dark:text-white">Platform event trail</h2>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600" onClick={() => exportCsv(filteredLogs)} type="button">
+            <button className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-brand-500/20 transition hover:bg-brand-600" onClick={handleExportCsv} type="button">
               <Download className="h-4 w-4" />
               Export CSV
             </button>
-            <button className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200" onClick={() => window.print()} type="button">
+            <button className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-brand-300 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-200" onClick={handleExportPdf} type="button">
               <FileText className="h-4 w-4" />
               Export PDF
             </button>
@@ -133,7 +175,7 @@ export function AuditLogsPage() {
             <select
               className="w-full bg-transparent outline-none"
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as 'ALL' | 'SUCCESS' | 'FAILURE')}
+              onChange={(e) => setStatusFilter(e.target.value as 'ALL' | AuditLogStatus)}
             >
               <option value="ALL">All Status</option>
               <option value="SUCCESS">Success</option>
@@ -146,13 +188,15 @@ export function AuditLogsPage() {
             <select
               className="w-full bg-transparent outline-none"
               value={actionFilter}
-              onChange={(e) => setActionFilter(e.target.value as 'ALL' | 'CREATE' | 'UPDATE' | 'DELETE' | 'LOGIN')}
+              onChange={(e) => setActionFilter(e.target.value as ActionFilter)}
             >
               <option value="ALL">All Actions</option>
               <option value="CREATE">Create</option>
               <option value="UPDATE">Update</option>
               <option value="DELETE">Delete</option>
               <option value="LOGIN">Login</option>
+              <option value="EXPORT">Export</option>
+              <option value="SETTINGS">Settings</option>
             </select>
           </label>
 
@@ -164,6 +208,8 @@ export function AuditLogsPage() {
             Clear filters
           </button>
         </div>
+
+        {loading ? <LoadingSpinner label="Loading audit logs..." /> : null}
 
         <div className="overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800">
           <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-800">

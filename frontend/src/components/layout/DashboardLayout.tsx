@@ -4,16 +4,18 @@ import { LoadingSpinner } from '../common/LoadingSpinner';
 import { Sidebar } from './Sidebar';
 import { Navbar } from './Navbar';
 import { useSession } from '../../context/SessionContext';
+import { useI18n } from '../../context/I18nContext';
 
 export function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { currentUser, error, loading } = useSession();
+  const { t } = useI18n();
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center px-6">
         <div className="glass-panel rounded-[32px] px-8 py-6">
-          <LoadingSpinner label="Loading your dashboard..." />
+          <LoadingSpinner label={t('loading.dashboard')} />
         </div>
       </div>
     );

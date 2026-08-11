@@ -7,11 +7,29 @@ interface SessionContextValue {
   loading: boolean;
   error: string | null;
   refreshSession: () => Promise<void>;
+  updateLocalProfile: (profile: Partial<Pick<User, 'avatarUrl' | 'firstName' | 'lastName' | 'email' | 'phoneNumber' | 'department' | 'jobTitle'>>) => void;
   login: (email: string, password: string) => Promise<void>;
   clearSession: () => void;
 }
 
 const SessionContext = createContext<SessionContextValue | undefined>(undefined);
+const PROFILE_STORAGE_PREFIX = 'copilote_profile_overrides:';
+
+function profileStorageKey(userId: number) {
+  return `${PROFILE_STORAGE_PREFIX}${userId}`;
+}
+
+function loadProfileOverrides(userId: number) {
+  try {
+    return JSON.parse(localStorage.getItem(profileStorageKey(userId)) ?? '{}') as Partial<User>;
+  } catch {
+    return {};
+  }
+}
+
+function mergeProfileOverrides(user: User) {
+  return { ...user, ...loadProfileOverrides(user.id) };
+}
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -32,7 +50,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
     try {
       const user = await userApi.getCurrentUser();
-      setCurrentUser(user);
+      setCurrentUser(mergeProfileOverrides(user));
       setError(null);
     } catch (refreshError) {
       tokenStorage.clear();
@@ -61,6 +79,23 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     setError(null);
   };
 
+  const updateLocalProfile = (profile: Partial<Pick<User, 'avatarUrl' | 'firstName' | 'lastName' | 'email' | 'phoneNumber' | 'department' | 'jobTitle'>>) => {
+    setCurrentUser((current) => {
+      if (!current) return current;
+      const next = { ...current, ...profile };
+      localStorage.setItem(profileStorageKey(current.id), JSON.stringify({
+        avatarUrl: next.avatarUrl,
+        firstName: next.firstName,
+        lastName: next.lastName,
+        email: next.email,
+        phoneNumber: next.phoneNumber,
+        department: next.department,
+        jobTitle: next.jobTitle
+      }));
+      return next;
+    });
+  };
+
   useEffect(() => {
     void refreshSession();
   }, []);
@@ -72,6 +107,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         loading,
         error,
         refreshSession,
+        updateLocalProfile,
         login,
         clearSession
       }}

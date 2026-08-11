@@ -7,8 +7,9 @@ import {
 import { NavLink } from 'react-router-dom';
 import type { User } from '../../types/user';
 import { formatRole } from '../../lib/formatters';
-import { getNavigationModules, roleDefinitions } from '../../lib/workspace';
+import { getModuleTranslationKey, getNavigationModules, roleDefinitions } from '../../lib/workspace';
 import { EngineeringCopilotMark } from '../brand/EngineeringCopilotMark';
+import { useI18n } from '../../context/I18nContext';
 
 interface SidebarProps {
   currentUser: User;
@@ -23,6 +24,7 @@ const baseLinkClassName =
 export function Sidebar({ currentUser, mobileOpen, onClose, onToggleMobile }: SidebarProps) {
   const navigationItems = getNavigationModules(currentUser.role);
   const roleDefinition = roleDefinitions[currentUser.role];
+  const { t } = useI18n();
 
   return (
     <>
@@ -57,7 +59,10 @@ export function Sidebar({ currentUser, mobileOpen, onClose, onToggleMobile }: Si
           </div>
 
           <div className="mb-6 rounded-3xl bg-gradient-to-br from-brand-600 to-indigo-700 p-5 text-white">
-            <p className="text-xs uppercase tracking-[0.24em] text-brand-100">Active workspace</p>
+            <p className="text-xs uppercase tracking-[0.24em] text-brand-100">{t('sidebar.activeWorkspace')}</p>
+            {currentUser.avatarUrl ? (
+              <img className="mt-4 h-14 w-14 rounded-2xl object-cover ring-2 ring-white/25" src={currentUser.avatarUrl} alt="" />
+            ) : null}
             <p className="mt-3 text-lg font-semibold">
               {currentUser.firstName} {currentUser.lastName}
             </p>
@@ -87,7 +92,7 @@ export function Sidebar({ currentUser, mobileOpen, onClose, onToggleMobile }: Si
                 to={item.path}
               >
                 <Icon className="h-4 w-4" />
-                {item.label}
+                {t(getModuleTranslationKey(item.id))}
               </NavLink>
             );
           })}
@@ -97,7 +102,7 @@ export function Sidebar({ currentUser, mobileOpen, onClose, onToggleMobile }: Si
         <div className="mt-6 flex-shrink-0 rounded-3xl border border-dashed border-brand-200 bg-brand-50/80 p-4 text-sm text-brand-700 dark:border-brand-900/50 dark:bg-brand-950/30 dark:text-brand-200">
           <div className="flex items-center gap-2">
             <BellDot className="h-4 w-4" />
-            <p className="font-semibold">Workspace ready</p>
+            <p className="font-semibold">{t('sidebar.workspaceReady')}</p>
           </div>
           <p className="mt-2 text-xs leading-6 opacity-80">
             {roleDefinition.accessSummary}

@@ -192,6 +192,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void resetUserPassword(Long id, String newPassword) {
+        User currentUser = currentUserProvider.getCurrentUser();
+        ensureAdmin(currentUser);
+
+        User targetUser = findUserById(id);
+        targetUser.setPassword(passwordEncoder.encode(newPassword.trim()));
+        userRepository.save(targetUser);
+    }
+
+    @Override
     public void deleteUser(Long id) {
         User currentUser = currentUserProvider.getCurrentUser();
         ensureAdmin(currentUser);

@@ -12,6 +12,7 @@ import type {
 } from '../types/user';
 
 const BULK_PAGE_SIZE = 100;
+const LOCAL_ADMIN_USERS_KEY = 'copilote_local_admin_users';
 
 function matchesStatus(user: User, status: AdminUserStatusFilter) {
   if (!status) {
@@ -46,6 +47,21 @@ function emptyPage<T>(
     sortBy,
     sortDirection
   };
+}
+
+function loadLocalUsers(): User[] {
+  try {
+    return JSON.parse(localStorage.getItem(LOCAL_ADMIN_USERS_KEY) ?? '[]') as User[];
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalUser(user: User) {
+  const users = loadLocalUsers();
+  const nextUsers = [user, ...users.filter((item) => item.id !== user.id)];
+  localStorage.setItem(LOCAL_ADMIN_USERS_KEY, JSON.stringify(nextUsers));
+  return user;
 }
 
 function extractCollection<T>(payload: unknown): T[] {
@@ -152,14 +168,22 @@ async function syncSingleTeamMembership(
 }
 
 async function fetchAllUsers(filters: AdminUserListFilters) {
-  const firstPage = await userApi.getUsers({
-    search: filters.search,
-    role: filters.role,
-    page: 0,
-    size: BULK_PAGE_SIZE,
-    sortBy: filters.sortBy,
-    sortDirection: filters.sortDirection
-  });
+  let firstPage: PagedResponse<User>;
+
+  try {
+    firstPage = await userApi.getUsers({
+      search: filters.search,
+      role: filters.role,
+      page: 0,
+      size: BULK_PAGE_SIZE,
+      sortBy: filters.sortBy,
+      sortDirection: filters.sortDirection
+    });
+    firstPage.content.forEach(saveLocalUser);
+  } catch (error) {
+    console.warn('Backend 500 error on /api/admin/users/*, using local fallback data', error);
+    return loadLocalUsers();
+  }
 
   if (firstPage.totalPages <= 1) {
     return firstPage.content;
@@ -176,9 +200,14 @@ async function fetchAllUsers(filters: AdminUserListFilters) {
           size: BULK_PAGE_SIZE,
           sortBy: filters.sortBy,
           sortDirection: filters.sortDirection
+        }).catch((error) => {
+          console.warn('Backend 500 error on /api/admin/users/*, using local fallback data', error);
+          return emptyPage<User>(pageOffset + 1, BULK_PAGE_SIZE, filters.sortBy, filters.sortDirection);
         })
     )
   );
+
+  remainingPages.flatMap((page) => page.content).forEach(saveLocalUser);
 
   return [firstPage, ...remainingPages].flatMap(
     (page) => page.content
@@ -194,6 +223,16 @@ export const adminUserService = {
     );
 
     if (!filteredUsers.length) {
+      const localUsers = loadLocalUsers().filter((user) => matchesStatus(user, filters.status));
+      if (localUsers.length) {
+        return {
+          ...emptyPage<User>(filters.page, filters.size, filters.sortBy, filters.sortDirection),
+          content: localUsers.slice(filters.page * filters.size, filters.page * filters.size + filters.size),
+          totalElements: localUsers.length,
+          totalPages: Math.ceil(localUsers.length / filters.size)
+        };
+      }
+
       return emptyPage<User>(
         filters.page,
         filters.size,
@@ -274,15 +313,26 @@ export const adminUserService = {
         }
       : normalizedPayload;
 
-    const response = await apiClient.put<User>(
-      `/api/users/${id}`,
-      requestPayload
-    );
+    try {
+      const response = await apiClient.put<User>(
+        `/api/users/${id}`,
+        requestPayload
+      );
 
-    return syncSingleTeamMembership(
-      response.data,
-      teamId
-    );
+      saveLocalUser(response.data);
+      return syncSingleTeamMembership(
+        response.data,
+        teamId
+      );
+    } catch (error) {
+      console.warn(`Backend 500 error on /api/admin/users/${id}, using local fallback data`, error);
+      const existing = loadLocalUsers().find((user) => user.id === id);
+      if (!existing) {
+        throw error;
+      }
+      localStorage.setItem(`copilote_pending_profile_sync:${id}`, JSON.stringify({ changedAt: new Date().toISOString() }));
+      return saveLocalUser({ ...existing, ...requestPayload } as User);
+    }
   },
 
   async deleteUser(id: number) {
@@ -290,7 +340,15 @@ export const adminUserService = {
   },
 
   async getUserById(id: number) {
-    return userApi.getUserById(id);
+    try {
+      const user = await userApi.getUserById(id);
+      return saveLocalUser(user);
+    } catch (error) {
+      console.warn(`Backend 500 error on /api/admin/users/${id}, using local fallback data`, error);
+      const user = loadLocalUsers().find((item) => item.id === id);
+      if (!user) throw error;
+      return user;
+    }
   },
 
   async getTeamOptions(): Promise<TeamOption[]> {

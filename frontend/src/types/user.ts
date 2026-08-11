@@ -13,6 +13,10 @@ export interface User {
   lastName: string;
   username: string;
   email: string;
+  avatarUrl?: string;
+  phoneNumber?: string;
+  department?: string;
+  jobTitle?: string;
   role: Role;
   teams: TeamSummary[];
   enabled: boolean;
