@@ -2,6 +2,7 @@ package org.example.copilote.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.example.copilote.dto.Request.CreateTeamRequest;
+import org.example.copilote.dto.Request.SendEmailNotificationRequest;
 import org.example.copilote.dto.Request.TeamSearchRequest;
 import org.example.copilote.dto.Request.UpdateTeamRequest;
 import org.example.copilote.dto.Response.PagedResponse;
@@ -14,6 +15,7 @@ import org.example.copilote.exception.ResourceNotFoundException;
 import org.example.copilote.repository.TeamRepository;
 import org.example.copilote.repository.UserRepository;
 import org.example.copilote.security.CurrentUserProvider;
+import org.example.copilote.service.EmailNotificationService;
 import org.example.copilote.service.TeamService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +46,7 @@ public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
     private final UserRepository userRepository;
     private final CurrentUserProvider currentUserProvider;
+    private final EmailNotificationService emailNotificationService;
 
     @Override
     @Transactional(readOnly = true)
@@ -162,7 +165,10 @@ public class TeamServiceImpl implements TeamService {
 
         attachUserToTeam(team, user);
 
-        return mapToResponse(teamRepository.save(team));
+        Team savedTeam = teamRepository.save(team);
+        sendTeamMembershipEmailSafely(user, savedTeam);
+
+        return mapToResponse(savedTeam);
     }
 
     @Override
@@ -196,13 +202,22 @@ public class TeamServiceImpl implements TeamService {
         Team team = findTeamById(teamId);
         User user = findUserById(userId);
 
+        boolean addedToTeam = false;
+
         if (!isTeamMember(team, userId)) {
             attachUserToTeam(team, user);
+            addedToTeam = true;
         }
 
         team.setLeader(user);
 
-        return mapToResponse(teamRepository.save(team));
+        Team savedTeam = teamRepository.save(team);
+
+        if (addedToTeam) {
+            sendTeamMembershipEmailSafely(user, savedTeam);
+        }
+
+        return mapToResponse(savedTeam);
     }
 
     @Override
@@ -308,6 +323,24 @@ public class TeamServiceImpl implements TeamService {
 
         if (user.getTeams().stream().noneMatch(userTeam -> userTeam.getTeamId().equals(team.getTeamId()))) {
             user.getTeams().add(team);
+        }
+    }
+
+    private void sendTeamMembershipEmailSafely(User user, Team team) {
+        try {
+            SendEmailNotificationRequest request = new SendEmailNotificationRequest();
+            request.setTo(user.getEmail());
+            request.setSubject("You were added to " + team.getTeamName());
+            request.setBody("""
+                    Hello %s,
+
+                    You were added to the "%s" team in Engineering Copilot.
+
+                    You can now access the team workspace according to your role permissions.
+                    """.formatted(user.getFirstName(), team.getTeamName()));
+            emailNotificationService.send(request);
+        } catch (RuntimeException ignored) {
+            // Email delivery must not block team membership changes.
         }
     }
 

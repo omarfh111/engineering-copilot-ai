@@ -12,6 +12,7 @@ public class AuditLogResponse {
     private final Long id;
     private final LocalDateTime timestamp;
     private final String actor;
+    private final String actorEmail;
     private final String action;
     private final String ipAddress;
     private final AuditLogStatus status;

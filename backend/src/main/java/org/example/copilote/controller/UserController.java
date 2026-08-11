@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import org.example.copilote.dto.Request.ChangePasswordRequest;
 import lombok.RequiredArgsConstructor;
 import org.example.copilote.dto.Request.CreateUserRequest;
+import org.example.copilote.dto.Request.SendEmailNotificationRequest;
 import org.example.copilote.dto.Request.UserSearchRequest;
 import org.example.copilote.dto.Request.UserUpdateRequest;
 import org.example.copilote.dto.Response.PagedResponse;
@@ -13,6 +14,7 @@ import org.example.copilote.entity.AuditLogStatus;
 import org.example.copilote.entity.User;
 import org.example.copilote.security.CurrentUserProvider;
 import org.example.copilote.service.AuditLogService;
+import org.example.copilote.service.EmailNotificationService;
 import org.example.copilote.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ public class UserController {
 
     private final UserService userService;
     private final AuditLogService auditLogService;
+    private final EmailNotificationService emailNotificationService;
     private final CurrentUserProvider currentUserProvider;
     private final PasswordEncoder passwordEncoder;
 
@@ -36,7 +39,23 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
+        UserResponse response = userService.createUser(request);
+        sendEmailSafely(
+                response.getEmail(),
+                "Your Engineering Copilot account was created",
+                """
+                        Hello %s,
+
+                        Your Engineering Copilot account has been created.
+
+                        Email: %s
+                        Role: %s
+
+                        You can now sign in with the password provided by your administrator.
+                        """.formatted(response.getFirstName(), response.getEmail(), response.getRole())
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/me")
@@ -83,6 +102,12 @@ public class UserController {
             }
 
             userService.updateUser(currentUser.getId(), buildPasswordUpdateRequest(currentUser, request.getNewPassword()));
+            sendEmailSafely(
+                    currentUser.getEmail(),
+                    "Your Engineering Copilot password was changed",
+                    "Hello %s,\n\nYour Engineering Copilot password was changed successfully.\n\nIf you did not make this change, contact your administrator immediately."
+                            .formatted(currentUser.getFirstName())
+            );
             recordAuditSafely(currentUser, "User changed security password", ipAddress, AuditLogStatus.SUCCESS);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException exception) {
@@ -112,6 +137,18 @@ public class UserController {
             auditLogService.record(currentUser, action, ipAddress, status);
         } catch (RuntimeException ignored) {
             // Audit persistence must not block profile or password changes.
+        }
+    }
+
+    private void sendEmailSafely(String to, String subject, String body) {
+        try {
+            SendEmailNotificationRequest request = new SendEmailNotificationRequest();
+            request.setTo(to);
+            request.setSubject(subject);
+            request.setBody(body);
+            emailNotificationService.send(request);
+        } catch (RuntimeException ignored) {
+            // Email delivery must not block account updates.
         }
     }
 }

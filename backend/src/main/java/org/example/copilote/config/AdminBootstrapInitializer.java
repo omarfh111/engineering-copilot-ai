@@ -31,18 +31,22 @@ public class AdminBootstrapInitializer implements ApplicationRunner {
             return;
         }
 
-        if (userRepository.existsByRole(Role.ADMIN)) {
-            log.info("At least one admin already exists. Skipping bootstrap admin initialization.");
-            return;
-        }
-
         if (!hasRequiredBootstrapValues()) {
             log.warn("Bootstrap admin initialization was skipped because one or more required properties are blank.");
             return;
         }
 
+        boolean hasAdmin = userRepository.existsByRole(Role.ADMIN);
+
         userRepository.findByEmail(properties.getEmail().trim())
-                .ifPresentOrElse(this::promoteExistingUser, this::createBootstrapAdmin);
+                .ifPresentOrElse(this::promoteExistingUser, () -> {
+                    if (hasAdmin) {
+                        log.info("At least one admin already exists. Skipping bootstrap admin creation.");
+                        return;
+                    }
+
+                    createBootstrapAdmin();
+                });
     }
 
     private boolean hasRequiredBootstrapValues() {
@@ -57,9 +61,10 @@ public class AdminBootstrapInitializer implements ApplicationRunner {
         user.setRole(Role.ADMIN);
         user.setEnabled(true);
         user.setAccountLocked(false);
+        user.setPassword(passwordEncoder.encode(properties.getPassword().trim()));
         userRepository.save(user);
 
-        log.info("Existing user with email '{}' was promoted to ADMIN during bootstrap initialization.", user.getEmail());
+        log.info("Existing user with email '{}' was synchronized as the bootstrap ADMIN account.", user.getEmail());
     }
 
     private void createBootstrapAdmin() {

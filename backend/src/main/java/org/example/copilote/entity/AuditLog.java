@@ -27,16 +27,41 @@ public class AuditLog {
     @Column
     private String action;
 
+    @Column(name = "entity_type", nullable = false)
+    private String entityType;
+
+    @Column
+    private String description;
+
     @Column
     private String ipAddress;
 
     @Column
     private String status;
 
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    private LocalDateTime updatedAt;
+
     @PrePersist
     public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
         if (timestamp == null) {
-            timestamp = LocalDateTime.now();
+            timestamp = now;
         }
+        if (description == null || description.isBlank()) {
+            description = action == null || action.isBlank() ? "Audit event" : action;
+        }
+        if (entityType == null || entityType.isBlank()) {
+            entityType = "SYSTEM";
+        }
+        createdAt = now;
+        updatedAt = now;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 }

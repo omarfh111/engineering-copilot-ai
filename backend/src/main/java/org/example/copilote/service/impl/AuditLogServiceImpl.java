@@ -9,6 +9,9 @@ import org.example.copilote.entity.AuditLogStatus;
 import org.example.copilote.entity.User;
 import org.example.copilote.repository.AuditLogRepository;
 import org.example.copilote.service.AuditLogService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -60,11 +64,12 @@ public class AuditLogServiceImpl implements AuditLogService {
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public AuditLogResponse record(String actor, String action, String ipAddress, AuditLogStatus status) {
+        String resolvedAction = StringUtils.hasText(action) ? action.trim() : "Unknown action";
         AuditLog log = AuditLog.builder()
-                .actor(StringUtils.hasText(actor) ? actor.trim() : "Unknown actor")
-                .action(StringUtils.hasText(action) ? action.trim() : "Unknown action")
+                .actor(resolveActorEmail(actor))
+                .action(resolvedAction)
                 .ipAddress(StringUtils.hasText(ipAddress) ? ipAddress.trim() : "unknown")
-                .status((status == null ? AuditLogStatus.SUCCESS : status).name())
+                .status(toDatabaseStatus(resolveStatus(resolvedAction, status)))
                 .build();
 
         return mapToResponse(auditLogRepository.save(log));
@@ -72,10 +77,125 @@ public class AuditLogServiceImpl implements AuditLogService {
 
     @Override
     public AuditLogResponse record(User actor, String action, String ipAddress, AuditLogStatus status) {
-        String actorLabel = actor == null
-                ? "Unknown actor"
-                : "%s %s <%s>".formatted(actor.getFirstName(), actor.getLastName(), actor.getEmail());
-        return record(actorLabel, action, ipAddress, status);
+        return record(actor == null ? null : actor.getEmail(), action, ipAddress, status);
+    }
+
+    private String resolveActorEmail(String explicitActor) {
+        if (StringUtils.hasText(explicitActor) && !"Unknown actor".equalsIgnoreCase(explicitActor.trim())) {
+            return explicitActor.trim();
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return "Unknown actor";
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        String principalEmail = extractPrincipalEmail(principal);
+        if (StringUtils.hasText(principalEmail)) {
+            return principalEmail.trim();
+        }
+
+        if (isUsablePrincipalName(authentication.getName())) {
+            return authentication.getName().trim();
+        }
+
+        return "Unknown actor";
+    }
+
+    private String extractPrincipalEmail(Object principal) {
+        if (principal instanceof UserDetails userDetails && StringUtils.hasText(userDetails.getUsername())) {
+            return userDetails.getUsername().trim();
+        }
+
+        if (principal instanceof String principalName && isUsablePrincipalName(principalName)) {
+            return principalName.trim();
+        }
+
+        if (principal instanceof Map<?, ?> claims) {
+            return firstTextClaim(claims, "email", "sub", "preferred_username", "username");
+        }
+
+        String jwtEmail = invokeStringMethod(principal, "getClaimAsString", "email");
+        if (StringUtils.hasText(jwtEmail)) {
+            return jwtEmail.trim();
+        }
+
+        String jwtSubject = invokeStringMethod(principal, "getSubject");
+        if (StringUtils.hasText(jwtSubject)) {
+            return jwtSubject.trim();
+        }
+
+        String email = invokeStringMethod(principal, "getEmail");
+        if (StringUtils.hasText(email)) {
+            return email.trim();
+        }
+
+        String username = invokeStringMethod(principal, "getUsername");
+        if (StringUtils.hasText(username)) {
+            return username.trim();
+        }
+
+        return "";
+    }
+
+    private boolean isUsablePrincipalName(String value) {
+        return StringUtils.hasText(value) && !"anonymousUser".equalsIgnoreCase(value.trim());
+    }
+
+    private String firstTextClaim(Map<?, ?> claims, String... keys) {
+        for (String key : keys) {
+            Object value = claims.get(key);
+            if (value instanceof String text && StringUtils.hasText(text)) {
+                return text.trim();
+            }
+        }
+
+        return "";
+    }
+
+    private String invokeStringMethod(Object target, String methodName, String... arguments) {
+        if (target == null) {
+            return "";
+        }
+
+        try {
+            Class<?>[] argumentTypes = new Class<?>[arguments.length];
+            Object[] argumentValues = new Object[arguments.length];
+
+            for (int index = 0; index < arguments.length; index++) {
+                argumentTypes[index] = String.class;
+                argumentValues[index] = arguments[index];
+            }
+
+            Object value = target.getClass().getMethod(methodName, argumentTypes).invoke(target, argumentValues);
+            return value instanceof String text ? text : "";
+        } catch (ReflectiveOperationException exception) {
+            return "";
+        }
+    }
+
+    private AuditLogStatus resolveStatus(String action, AuditLogStatus status) {
+        if (status != null) {
+            return status;
+        }
+
+        String normalizedAction = action == null ? "" : action.trim().toUpperCase();
+
+        if (normalizedAction.contains("LOGIN_FAILED")
+                || normalizedAction.contains("LOGIN FAILURE")
+                || normalizedAction.contains("LOGIN FAILED")
+                || normalizedAction.contains("FAILED")) {
+            return AuditLogStatus.FAILURE;
+        }
+
+        return AuditLogStatus.SUCCESS;
+    }
+
+    private String toDatabaseStatus(AuditLogStatus status) {
+        return status == AuditLogStatus.FAILURE ? "FAILED" : "SUCCESS";
     }
 
     private Specification<AuditLog> buildSpecification(AuditLogSearchRequest request) {
@@ -118,14 +238,29 @@ public class AuditLogServiceImpl implements AuditLogService {
     }
 
     private AuditLogResponse mapToResponse(AuditLog log) {
+        String actorEmail = StringUtils.hasText(log.getActor()) ? log.getActor() : "Unknown actor";
         return AuditLogResponse.builder()
                 .id(log.getId())
-                .timestamp(log.getTimestamp() == null ? LocalDateTime.now() : log.getTimestamp())
-                .actor(StringUtils.hasText(log.getActor()) ? log.getActor() : "Unknown actor")
+                .timestamp(resolveTimestamp(log))
+                .actor(actorEmail)
+                .actorEmail(actorEmail)
                 .action(StringUtils.hasText(log.getAction()) ? log.getAction() : "Unknown action")
                 .ipAddress(StringUtils.hasText(log.getIpAddress()) ? log.getIpAddress() : "unknown")
                 .status(normalizeStatus(log.getStatus()))
                 .build();
+    }
+
+    private LocalDateTime resolveTimestamp(AuditLog log) {
+        if (log.getTimestamp() != null) {
+            return log.getTimestamp();
+        }
+        if (log.getCreatedAt() != null) {
+            return log.getCreatedAt();
+        }
+        if (log.getUpdatedAt() != null) {
+            return log.getUpdatedAt();
+        }
+        return LocalDateTime.now();
     }
 
     private AuditLogStatus normalizeStatus(String status) {
@@ -133,10 +268,22 @@ public class AuditLogServiceImpl implements AuditLogService {
             return AuditLogStatus.SUCCESS;
         }
 
-        try {
-            return AuditLogStatus.valueOf(status.trim().toUpperCase());
-        } catch (IllegalArgumentException exception) {
+        String normalizedStatus = status.trim().toUpperCase();
+
+        if ("FAILED".equals(normalizedStatus)
+                || "FAILURE".equals(normalizedStatus)
+                || "ERROR".equals(normalizedStatus)) {
+            return AuditLogStatus.FAILURE;
+        }
+
+        if ("SUCCESS".equals(normalizedStatus) || "SUCCEEDED".equals(normalizedStatus)) {
             return AuditLogStatus.SUCCESS;
+        }
+
+        try {
+            return AuditLogStatus.valueOf(normalizedStatus);
+        } catch (IllegalArgumentException exception) {
+            return AuditLogStatus.FAILURE;
         }
     }
 }

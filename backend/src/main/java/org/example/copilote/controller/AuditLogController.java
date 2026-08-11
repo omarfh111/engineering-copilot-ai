@@ -51,8 +51,8 @@ public class AuditLogController {
             @Valid @RequestBody CreateAuditLogRequest request,
             HttpServletRequest servletRequest
     ) {
-        User currentUser = currentUserProvider.getCurrentUser();
         try {
+            User currentUser = currentUserProvider.getCurrentUser();
             AuditLogResponse response = auditLogService.record(
                     currentUser,
                     request.getAction(),
@@ -61,7 +61,13 @@ public class AuditLogController {
             );
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException exception) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+            AuditLogResponse response = auditLogService.record(
+                    (String) null,
+                    request.getAction(),
+                    resolveClientIp(servletRequest),
+                    request.getStatus()
+            );
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         }
     }
 
@@ -69,6 +75,10 @@ public class AuditLogController {
         String forwardedFor = request.getHeader("X-Forwarded-For");
         if (forwardedFor != null && !forwardedFor.isBlank()) {
             return forwardedFor.split(",")[0].trim();
+        }
+        String realIp = request.getHeader("X-Real-IP");
+        if (realIp != null && !realIp.isBlank()) {
+            return realIp.trim();
         }
         return request.getRemoteAddr();
     }
