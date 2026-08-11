@@ -1,0 +1,3097 @@
+{
+  "scope": {
+    "collection": "exp_openai_text_embedding_3_small",
+    "questions_total": 64,
+    "questions_scored": 54,
+    "excluded_negative_questions": 10,
+    "top_k": 5,
+    "reranker": "none (retrieval-only comparison)"
+  },
+  "baseline": {
+    "questions_evaluated": 54,
+    "hit_at_5": 0.8333,
+    "precision_at_5": 0.6593,
+    "recall_at_5": 0.8117,
+    "mrr": 0.7515,
+    "average_latency_seconds": 0.294
+  },
+  "rewrite_only": {
+    "questions_evaluated": 54,
+    "hit_at_5": 0.8148,
+    "precision_at_5": 0.6481,
+    "recall_at_5": 0.7932,
+    "mrr": 0.7469,
+    "average_latency_seconds": 1.797
+  },
+  "rewrite_and_expansion": {
+    "questions_evaluated": 54,
+    "hit_at_5": 0.8148,
+    "precision_at_5": 0.6556,
+    "recall_at_5": 0.7932,
+    "mrr": 0.7346,
+    "average_latency_seconds": 5.241
+  },
+  "hierarchical": {
+    "questions_evaluated": 54,
+    "hit_at_5": 0.8519,
+    "precision_at_5": 0.6148,
+    "recall_at_5": 0.7963,
+    "mrr": 0.7022,
+    "average_latency_seconds": 1.1
+  },
+  "rewrite_and_expansion_delta": {
+    "hit_at_5": -0.0185,
+    "precision_at_5": -0.0037,
+    "recall_at_5": -0.0185,
+    "mrr": -0.0169,
+    "average_latency_seconds": 4.947
+  },
+  "rewrite_only_delta": {
+    "hit_at_5": -0.0185,
+    "precision_at_5": -0.0112,
+    "recall_at_5": -0.0185,
+    "mrr": -0.0046,
+    "average_latency_seconds": 1.503
+  },
+  "hierarchical_delta": {
+    "hit_at_5": 0.0186,
+    "precision_at_5": -0.0445,
+    "recall_at_5": -0.0154,
+    "mrr": -0.0493,
+    "average_latency_seconds": 0.806
+  },
+  "details": {
+    "baseline": [
+      {
+        "id": "F01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "F04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F05",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F06",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F07",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 0.25,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/The_SOLID_Principles.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "F08",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "F09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F10",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf"
+        ]
+      },
+      {
+        "id": "F11",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf"
+        ]
+      },
+      {
+        "id": "F12",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F14",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "F15",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F16",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F17",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F18",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F19",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F20",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F21",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F22",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf"
+        ]
+      },
+      {
+        "id": "F23",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "F24",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/ri3_k8s_101.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/docker-tutorial.pdf"
+        ]
+      },
+      {
+        "id": "F25",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf"
+        ]
+      },
+      {
+        "id": "F26",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F27",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F28",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "X01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "X02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X05",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/ri3_k8s_101.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/docker-tutorial.pdf"
+        ]
+      },
+      {
+        "id": "X06",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf"
+        ]
+      },
+      {
+        "id": "X07",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X08",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "X09",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X10",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X11",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X12",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/PDFFastAPISlides.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X14",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X15",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/SonarQube_in_Action.pdf",
+          "coding_standards/SonarQube_in_Action.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "coding_standards/SonarQube_in_Action.pdf"
+        ]
+      },
+      {
+        "id": "X16",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "M02",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "M03",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M04",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "M05",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M06",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "M07",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M08",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.3333333333333333,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/PDFFastAPISlides.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "M10",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf"
+        ]
+      }
+    ],
+    "rewrite_only": [
+      {
+        "id": "F01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "F04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F05",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F06",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F07",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "F08",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "F09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "F10",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf"
+        ]
+      },
+      {
+        "id": "F11",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf"
+        ]
+      },
+      {
+        "id": "F12",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F14",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "F15",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F16",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F17",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F18",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F19",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F20",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F21",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F22",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf"
+        ]
+      },
+      {
+        "id": "F23",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "F24",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/ri3_k8s_101.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F25",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf"
+        ]
+      },
+      {
+        "id": "F26",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F27",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F28",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "X01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf"
+        ]
+      },
+      {
+        "id": "X02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "X04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X05",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/ri3_k8s_101.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X06",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf"
+        ]
+      },
+      {
+        "id": "X07",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X08",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "X09",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X10",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X11",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf"
+        ]
+      },
+      {
+        "id": "X12",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/PDFFastAPISlides.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X14",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X15",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/SonarQube_in_Action.pdf",
+          "security/nist.sp.800-218.pdf",
+          "coding_standards/SonarQube_in_Action.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X16",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M01",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "M02",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "M03",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M04",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "M05",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M06",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "M07",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M08",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.3333333333333333,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/PDFFastAPISlides.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "M10",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      }
+    ],
+    "rewrite_and_expansion": [
+      {
+        "id": "F01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F05",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F06",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F07",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F08",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "F09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "F10",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf"
+        ]
+      },
+      {
+        "id": "F11",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf"
+        ]
+      },
+      {
+        "id": "F12",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F14",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "F15",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F16",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F17",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F18",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F19",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F20",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F21",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F22",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F23",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F24",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/ri3_k8s_101.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F25",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf"
+        ]
+      },
+      {
+        "id": "F26",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F27",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F28",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "X01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "X02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X03",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "X04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X05",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/ri3_k8s_101.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "X06",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5,
+        "mrr": 0.3333333333333333,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "X07",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X08",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "X09",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X10",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X11",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X12",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/PDFFastAPISlides.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X14",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X15",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/SonarQube_in_Action.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "coding_standards/SonarQube_in_Action.pdf"
+        ]
+      },
+      {
+        "id": "X16",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M01",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "M02",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "M03",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M04",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "M05",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M06",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "M07",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M08",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.3333333333333333,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/PDFFastAPISlides.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf"
+        ]
+      },
+      {
+        "id": "M09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "M10",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      }
+    ],
+    "hierarchical": [
+      {
+        "id": "F01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "F04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F05",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F06",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F07",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 0.25,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/The_SOLID_Principles.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "F08",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "F09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F10",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf"
+        ]
+      },
+      {
+        "id": "F11",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf"
+        ]
+      },
+      {
+        "id": "F12",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F14",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "F15",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F16",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F17",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F18",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "F19",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F20",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "F21",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F22",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf"
+        ]
+      },
+      {
+        "id": "F23",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "F24",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/ri3_k8s_101.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/docker-tutorial.pdf"
+        ]
+      },
+      {
+        "id": "F25",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/OWASPLondon_20190225_vanderaj_ASVSv4.pdf"
+        ]
+      },
+      {
+        "id": "F26",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "F27",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "F28",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf"
+        ]
+      },
+      {
+        "id": "X01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.6,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "X02",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "coding_standards/clean-code.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X04",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X05",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/ri3_k8s_101.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/docker-tutorial.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X06",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.3333333333333333,
+        "sources": [
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/clean-code.pdf",
+          "coding_standards/coding_best_practices_2020-06-03.pdf"
+        ]
+      },
+      {
+        "id": "X07",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "X08",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/nistspecialpublication500-292.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "X09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "X10",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X11",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "X12",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "framework_docs/PDFFastAPISlides.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "X13",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X14",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "X15",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "X16",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M01",
+        "hit_at_5": 1,
+        "precision_at_5": 0.8,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/owasp-api-security-top-10.pdf"
+        ]
+      },
+      {
+        "id": "M02",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 0.6666666666666666,
+        "mrr": 0.5,
+        "sources": [
+          "framework_docs/spring-boot-reference.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "framework_docs/spring-boot-reference.pdf"
+        ]
+      },
+      {
+        "id": "M03",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.3333333333333333,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "framework_docs/ri3_k8s_101.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "M04",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "architecture/hexagonal-architectures.pdf"
+        ]
+      },
+      {
+        "id": "M05",
+        "hit_at_5": 0,
+        "precision_at_5": 0.0,
+        "recall_at_5": 0.0,
+        "mrr": 0.0,
+        "sources": [
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf",
+          "security/nist.sp.800-218.pdf"
+        ]
+      },
+      {
+        "id": "M06",
+        "hit_at_5": 1,
+        "precision_at_5": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "sources": [
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "coding_standards/Java Coding Guidelines_ 75 Recommendations for Reliable and Secure Programs.pdf",
+          "security/owasp-api-security-top-10.pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf"
+        ]
+      },
+      {
+        "id": "M07",
+        "hit_at_5": 1,
+        "precision_at_5": 0.4,
+        "recall_at_5": 0.6666666666666666,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "security/nist.sp.800-218.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M08",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.3333333333333333,
+        "mrr": 0.5,
+        "sources": [
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/PDFFastAPISlides.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "architecture/Microservices_Designing_Deploying.pdf"
+        ]
+      },
+      {
+        "id": "M09",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5,
+        "mrr": 0.3333333333333333,
+        "sources": [
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "architecture/hexagonal-architectures.pdf",
+          "framework_docs/spring-boot-reference.pdf",
+          "architecture/Clean Architecture A Craftsman's Guide to Software Structure and Design.pdf"
+        ]
+      },
+      {
+        "id": "M10",
+        "hit_at_5": 1,
+        "precision_at_5": 0.2,
+        "recall_at_5": 0.5,
+        "mrr": 0.5,
+        "sources": [
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/OWASP_SCP_Quick_Reference_Guide_v21.pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf",
+          "security/preparing-for-the-new-owasp-top-10-and-beyond .pdf"
+        ]
+      }
+    ]
+  }
+}

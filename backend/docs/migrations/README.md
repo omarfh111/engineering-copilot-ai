@@ -24,6 +24,8 @@ psql -h localhost -p 5432 -U postgres -d copilote_db -W `
   -f backend/docs/migrations/V20260725_02__add_impact_analysis_type.sql
 psql -h localhost -p 5432 -U postgres -d copilote_db -W `
   -f backend/docs/migrations/V20260726_01__reviewable_todo_proposals.sql
+psql -h localhost -p 5432 -U postgres -d copilote_db -W `
+  -f backend/docs/migrations/V20260728_01__audit_events.sql
 ```
 
 4. Redémarrer Spring Boot puis vérifier que l'écran *Analyses* peut afficher

@@ -31,6 +31,8 @@ import { TodoDetailsPage } from './pages/TodoDetailsPage';
 import { UserDetailsPage } from './pages/UserDetailsPage';
 import { WorkspaceSectionPage } from './pages/WorkspaceSectionPage';
 import { SystemHealthPage } from './pages/SystemHealthPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { AuditLogsPage } from './pages/AuditLogsPage';
 
 const sectionModuleIds: WorkspaceModuleId[] = [
   'settings',
@@ -291,6 +293,40 @@ function App() {
         <Route path="/dashboard/users/:id" element={<UserDetailsPage />} />
         {sectionModuleIds.map((moduleId) => {
           const module = workspaceModules[moduleId];
+
+          if (moduleId === 'settings') {
+            return (
+              <Route
+                element={
+                  <RoleGuard
+                    allowedRoles={module.allowedRoles}
+                    description="Only Engineering Copilot administrators can manage platform settings."
+                  >
+                    <SettingsPage />
+                  </RoleGuard>
+                }
+                key={module.id}
+                path={module.path}
+              />
+            );
+          }
+
+          if (moduleId === 'audit') {
+            return (
+              <Route
+                element={
+                  <RoleGuard
+                    allowedRoles={module.allowedRoles}
+                    description="Only Engineering Copilot administrators can inspect the audit trail."
+                  >
+                    <AuditLogsPage />
+                  </RoleGuard>
+                }
+                key={module.id}
+                path={module.path}
+              />
+            );
+          }
 
           if (moduleId === 'system-health') {
             return (
