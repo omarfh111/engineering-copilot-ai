@@ -16,6 +16,13 @@ Plateforme d'assistance à l'ingénierie logicielle. Elle centralise les projets
 
 > État de livraison : Sprint 4 en cours de validation. Voir l'[audit de finalisation](docs/FINALIZATION_AUDIT.md) avant toute fusion vers `main`.
 
+| Vue rapide | Statut de vérification local du 12 août 2026 |
+| --- | --- |
+| Frontend React | Serveur Vite répond en HTTP 200 ; build TypeScript/Vite réussi. |
+| Backend Spring Boot | Processus et PostgreSQL joignables ; les routes métier restent protégées par JWT. |
+| Service IA FastAPI | Liveness `/health` répond `ok` ; le contrôle RAG exige Qdrant. |
+| Recherche vectorielle | Non validée dans cette session : Qdrant (6333) n'était pas démarré. |
+
 ## Architecture
 
 ```mermaid
@@ -81,7 +88,7 @@ Les services sont disponibles sur React `5173`, Spring Boot `8081`, FastAPI `800
 ```powershell
 cd frontend; npm run build
 cd ..\ai-service; python -m pytest -q
-cd ..\backend; .\mvnw.cmd -Dtest=AuditLogServiceImplTest test
+cd ..\backend; .\mvnw.cmd test
 ```
 
 Les tests d'intégration IA et ceux appelant des fournisseurs externes sont marqués `integration` et exclus par défaut. Pour les demander explicitement :
@@ -91,10 +98,11 @@ $env:RUN_LIVE_INTEGRATION_TESTS = "1"
 python -m pytest tests -m integration -q
 ```
 
-La CI GitHub exécute ces contrôles à chaque push sur `main`, `sprint4`, `Sprint2` et `Sprint3`, ainsi que sur chaque pull request vers `main`. Elle ne déploie jamais automatiquement.
+La CI GitHub exécute ces contrôles à chaque push sur `main`, `sprint4`, `Sprint2` et `Sprint3`, ainsi que sur chaque pull request vers `main`. Le job backend démarre un PostgreSQL éphémère pour ses smoke tests ; la CI ne déploie jamais automatiquement.
 
 ## Documentation
 
+- [Guide technique et d'exploitation](docs/TECHNICAL_GUIDE.md) — architecture détaillée, flux, prérequis, exécution, métriques RAG et limites
 - [Audit de finalisation Sprint 4](docs/FINALIZATION_AUDIT.md)
 - [Validation Sprint 2](docs/SPRINT2_ACCEPTANCE.md)
 - [Architecture des agents Sprint 3](docs/SPRINT3_AGENT_ARCHITECTURE.md)
@@ -102,6 +110,8 @@ La CI GitHub exécute ces contrôles à chaque push sur `main`, `sprint4`, `Spri
 - [Contrat Spring Boot — IA](backend/docs/ROUTAGE_SAE_IA.md)
 - [Architecture backend](backend/docs/ARCHITECTURE.md)
 - [Guide du service IA](ai-service/README.md)
+
+Le [guide technique](docs/TECHNICAL_GUIDE.md) est le point d'entrée recommandé pour le rapport de stage : il explique les décisions d'architecture, les frontières de sécurité, les diagrammes de séquence, les résultats d'évaluation et les incidents résolus.
 
 ## Git et livraison
 

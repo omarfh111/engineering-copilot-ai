@@ -24,4 +24,4 @@ cd backend; .\mvnw.cmd spring-boot:run
 cd frontend; npm ci; npm run dev
 ```
 
-Consulter le [README](README.md) pour l'architecture, les tests, la sécurité et le processus de livraison, puis l'[audit Sprint 4](docs/FINALIZATION_AUDIT.md) avant une fusion dans `main`.
+Consulter d'abord le [guide technique](docs/TECHNICAL_GUIDE.md) pour l'architecture, les flux, les métriques et les incidents résolus ; puis le [README](README.md) pour la commande de démarrage et l'[audit Sprint 4](docs/FINALIZATION_AUDIT.md) avant une fusion dans `main`.

@@ -44,8 +44,28 @@ jobs:
       - run: python -m pytest -q
 
   backend:
-    name: Backend compile and unit tests
+    name: Backend compile and integration tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: copilote_db
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d copilote_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/copilote_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
+      AI_INTERNAL_API_KEY: ci-not-a-secret
     defaults:
       run:
         working-directory: backend
@@ -57,5 +77,5 @@ jobs:
           java-version: '17'
           cache: maven
       - run: chmod +x mvnw
+      - run: ./mvnw test
       - run: ./mvnw -DskipTests package
-      - run: ./mvnw -Dtest=AuditLogServiceImplTest test
