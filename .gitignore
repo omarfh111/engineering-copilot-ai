@@ -53,3 +53,7 @@ dist/
 # Temporary files
 *.tmp
 *.bak
+
+# Runtime-uploaded documents: keep local data out of the source repository.
+/storage/documents/*
+!/storage/documents/.gitkeep

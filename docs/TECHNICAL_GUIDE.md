@@ -100,7 +100,7 @@ sequenceDiagram
 | Node.js | 22+ | `node --version` |
 | Python | 3.12 | `python --version` |
 | PostgreSQL | 16 recommandé | port 5432 accessible |
-| Qdrant | version Docker courante | port 6333 accessible |
+| Qdrant | Docker local ou Qdrant Cloud compatible | port 6333 local ou sonde RAG protégée disponible |
 | Docker Desktop ou moteur Compose équivalent | requis pour `infra/` | `docker compose version` |
 
 Créer les fichiers locaux à partir des exemples :
@@ -147,10 +147,9 @@ La valeur `AI_INTERNAL_API_KEY` doit être forte et identique dans `backend/.env
    Invoke-WebRequest http://127.0.0.1:8000/health
    Test-NetConnection 127.0.0.1 -Port 8081
    Test-NetConnection 127.0.0.1 -Port 5432
-   Test-NetConnection 127.0.0.1 -Port 6333
    ```
 
-`/api/health` côté backend est réservé aux utilisateurs authentifiés : une réponse `401` sans JWT est donc attendue. La liveness FastAPI confirme que le processus est actif ; la route interne RAG confirme en plus la présence de Qdrant et de la configuration de clé.
+Si `QDRANT_URL` cible une instance locale, ajouter `Test-NetConnection 127.0.0.1 -Port 6333`. Si elle cible Qdrant Cloud, vérifier plutôt la route interne RAG avec la clé de service. `/api/health` côté backend est réservé aux utilisateurs authentifiés : une réponse `401` sans JWT est donc attendue. La liveness FastAPI confirme que le processus est actif ; la route interne RAG confirme en plus la présence de Qdrant et de la configuration de clé.
 
 ## 5. Tests et assurance qualité
 
@@ -183,7 +182,7 @@ Lecture : `Hit@file` mesure la présence du bon document dans les résultats, `P
 | IDE configuré avec Java 8 alors que Maven cible 17 | JDK de module IntelliJ incohérent | Module configuré sur Corretto 17 | Vérifier `Project SDK` et `JAVA_HOME` avant la compilation. |
 | Tests IA bloqués par des variables d'environnement absentes | Tests de diagnostic et intégrations externes collectés par défaut | Configuration sûre par défaut, marqueur `integration`, collecte ciblée | Laisser les tests connectés explicites et documenter leurs dépendances. |
 | CI IA instable | Fournisseurs, Qdrant ou secrets requis en collection | Tests externes exclus de la CI légère | Exécuter l'intégration dans un environnement éphémère avec secrets. |
-| RAG indisponible localement | Qdrant non démarré | Démarrer `infra/docker-compose.yml` ou fournir un Qdrant compatible | Tester le port 6333 avant les flux RAG. |
+| Sonde RAG initialement indisponible | Processus FastAPI lancé dans un bac à sable sans accès au Qdrant Cloud | Redémarrage du service dans un contexte réseau autorisé ; la collection a répondu avec 800 vecteurs | Tester la sonde RAG protégée lorsque Qdrant est externe. |
 
 ## 8. Limites connues et suivi de production
 

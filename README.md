@@ -21,7 +21,7 @@ Plateforme d'assistance à l'ingénierie logicielle. Elle centralise les projets
 | Frontend React | Serveur Vite répond en HTTP 200 ; build TypeScript/Vite réussi. |
 | Backend Spring Boot | Processus et PostgreSQL joignables ; les routes métier restent protégées par JWT. |
 | Service IA FastAPI | Liveness `/health` répond `ok` ; le contrôle RAG exige Qdrant. |
-| Recherche vectorielle | Non validée dans cette session : Qdrant (6333) n'était pas démarré. |
+| Recherche vectorielle | Validée via la sonde RAG protégée : collection Qdrant existante, 800 vecteurs. |
 
 ## Architecture
 
