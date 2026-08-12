@@ -2,7 +2,7 @@
 
 **Date :** 12 août 2026
 **Branche auditée :** `sprint4` (commit de départ `d4063e1`)
-**Décision :** **NO-GO pour la fusion dans `main` à cette étape.**
+**Décision :** **NO-GO temporaire pour la fusion dans `main` : la révocation du secret SMTP historiquement exposé doit être confirmée.**
 
 ## Périmètre vérifié
 
@@ -11,25 +11,25 @@
 | Historique Git | Conforme | `main` est un ancêtre de `sprint4` ; les branches `Sprint2`, `Sprint3`, `sae` et `sprint4` existent sur `origin`. |
 | Frontend | Conforme avec réserve | `npm run build` réussit ; le bundle JavaScript principal fait 834 kB minifié, au-dessus du seuil d'avertissement de Vite. |
 | Service IA | Corrigé et vérifiable | Pytest ne collecte que les vrais tests de `ai-service/tests`, exclut les diagnostics connectés à PostgreSQL et les intégrations externes par défaut. |
-| Backend | À valider localement | Le projet cible Java 17, ce qui est compatible avec le JDK Corretto 17 configuré dans l'IDE. Maven doit pouvoir accéder au dépôt Central avec un certificat approuvé. |
+| Backend | Conforme | Compilation et test unitaire réussis localement avec Corretto 17 après ajout de la racine TLS locale de Norton au magasin Java. |
 | CI | Ajoutée | `.github/workflows/ci.yml` construit le frontend, teste le service IA et compile/teste l'unité backend sous Java 17. |
-| Jenkins | À corriger avant emploi | Le pipeline actuel tente un `docker compose` à la racine, sans fichier Compose ni Dockerfile racine, et déploie automatiquement. |
+| Jenkins | Corrigé | Le pipeline valide backend, frontend et IA sans déploiement automatique ni appel à un Compose inexistant. |
 
 ## Conditions obligatoires avant la fusion
 
-1. Laisser s'exécuter la CI GitHub ajoutée et obtenir trois jobs verts.
-2. Corriger ou remplacer le `Jenkinsfile` : séparer validation et déploiement, et utiliser des fichiers Docker/Compose réellement présents.
+1. Révoquer et remplacer le mot de passe SMTP qui était auparavant présent dans `backend/.env.example`; une suppression du fichier courant ne purge pas l'historique Git. Cette action appartient au propriétaire du compte SMTP.
+2. Laisser s'exécuter la CI GitHub ajoutée et obtenir trois jobs verts sur le commit de finalisation.
 3. Ajouter une exécution d'intégration backend avec une base PostgreSQL initialisée. Les tests `@SpringBootTest` actuels ne sont pas exécutés par la CI légère, car `spring.jpa.hibernate.ddl-auto=validate` exige un schéma existant.
-4. S'assurer que tous les postes utilisent Java 17 ou une version ultérieure et recharger le projet Maven après toute modification du `pom.xml`.
-5. Examiner les artefacts suivis par Git (`frontend/*.tsbuildinfo` et `storage/documents/...pdf`) et les retirer de l'index s'ils ne sont pas des jeux de données explicitement requis.
+4. Examiner les artefacts suivis par Git (`frontend/*.tsbuildinfo` et `storage/documents/...pdf`) et les retirer de l'index s'ils ne sont pas des jeux de données explicitement requis.
 
 ## Tests exécutés dans cet audit
 
 | Commande | Résultat |
 | --- | --- |
 | `frontend: npm run build` | Réussi |
-| `ai-service: python -m pytest tests/test_foundation_agents.py -q` | 16 réussis, 2 échecs initiaux corrigés dans les attentes de test |
-| `backend: .\\mvnw.cmd test` | Non exécutable localement : erreur de certificat Maven (`PKIX`) avant compilation |
+| `ai-service: python -m pytest -q` | 34 réussis, 8 ignorés (intégrations externes volontairement désactivées), 1 désélectionné |
+| `backend: mvnw.cmd -DskipTests package` | Réussi avec Corretto 17 |
+| `backend: mvnw.cmd -Dtest=AuditLogServiceImplTest test` | Réussi |
 
 ## Après les corrections
 

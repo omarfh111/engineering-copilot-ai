@@ -122,6 +122,7 @@ Pour la procédure de fusion approuvée, suivre exactement la section « Après 
 - Garder `AI_INTERNAL_API_KEY` identique uniquement entre backend et service IA ; elle ne doit jamais être exposée au navigateur.
 - Configurer `APP_CORS_ALLOWED_ORIGINS` avec les origines exactes du frontend.
 - Les propositions IA et les écritures métier sont soumises à une revue humaine.
+- Si un secret a été commité par erreur, le révoquer chez son fournisseur, en générer un nouveau et le placer uniquement dans le fichier local `.env` ou dans le coffre de secrets du déploiement. Retirer le secret du fichier courant ne suffit pas, car l'historique Git peut déjà le contenir.
 
 ## Licence
 

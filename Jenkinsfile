@@ -13,13 +13,14 @@ pipeline {
             }
         }
 
-        stage('Backend Tests & Package') {
+        stage('Backend compile and unit test') {
             steps {
                 dir('backend') {
                     sh '''
-                        set -euxo pipefail
+                        set -eux
                         chmod +x ./mvnw
-                        ./mvnw clean test package -DskipTests=false
+                        ./mvnw -DskipTests package
+                        ./mvnw -Dtest=AuditLogServiceImplTest test
                     '''
                 }
             }
@@ -30,11 +31,11 @@ pipeline {
             }
         }
 
-        stage('Frontend Build') {
+        stage('Frontend build') {
             steps {
                 dir('frontend') {
                     sh '''
-                        set -euxo pipefail
+                        set -eux
                         npm ci
                         npm run build
                     '''
@@ -42,32 +43,22 @@ pipeline {
             }
         }
 
-        stage('Docker Build') {
+        stage('AI service tests') {
             steps {
-                sh '''
-                    set -euxo pipefail
-                    docker compose build
-                '''
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh '''
-                    set -euxo pipefail
-                    docker compose down
-                    docker compose up -d
-                '''
+                dir('ai-service') {
+                    sh '''
+                        set -eux
+                        python -m pip install -r requirements.txt
+                        python -m pytest -q
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo 'Pipeline completed successfully. engineering-copilot-ai is built and deployed.'
-        }
-        failure {
-            echo 'Pipeline failed. Review the stage logs and archived test results for details.'
+            echo 'Validation completed successfully. Deployment remains a separate, explicitly approved operation.'
         }
         always {
             cleanWs()
