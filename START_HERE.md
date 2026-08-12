@@ -1,25 +1,27 @@
-# Démarrage rapide - Engineering Copilot
+# Démarrage rapide — Engineering Copilot
 
-La structure est un monorepo technique : les noms ne dépendent plus de la répartition des tâches du binôme.
+Le dépôt est un monorepo : `frontend/` (React), `backend/` (Spring Boot), `ai-service/` (FastAPI) et `infra/` (PostgreSQL, Qdrant, Mailpit).
 
-```text
-frontend/    React + Vite
-backend/     Spring Boot, API métier, PostgreSQL et sécurité
-ai-service/  FastAPI, ingestion, embeddings, RAG et Qdrant
-infra/       Docker Compose pour PostgreSQL et Qdrant
-docs/        Validation Sprint 2 et backlog Sprint 3
+## Prérequis
+
+- Java 21, Python 3.12, Node.js 22 et Docker Desktop.
+- Une clé OpenAI seulement pour les opérations IA qui sollicitent un modèle externe.
+
+## Lancer le projet
+
+```powershell
+Copy-Item backend/.env.example backend/.env
+Copy-Item ai-service/.env.example ai-service/.env
+Copy-Item frontend/.env.example frontend/.env
+docker compose -f infra/docker-compose.yml up -d
 ```
 
-## Ordre de démarrage
+Renseigner les variables dans les fichiers `.env`, notamment une même valeur `AI_INTERNAL_API_KEY` côté backend et service IA. Puis lancer les trois applications dans des terminaux séparés :
 
-1. Créer `backend/.env` depuis `backend/.env.example`.
-2. Créer `ai-service/.env` depuis `ai-service/.env.example`.
-3. Définir exactement la même valeur `AI_INTERNAL_API_KEY` dans les deux fichiers.
-4. Depuis la racine : `docker compose -f infra/docker-compose.yml up -d`.
-5. Depuis `ai-service` : installer les dépendances Python, puis lancer `python -m uvicorn app.main:app --reload --port 8000`.
-6. Depuis `backend` : avec Java 17+, lancer `./mvnw spring-boot:run` (Windows : `mvnw.cmd spring-boot:run`).
-7. Depuis `frontend` : `npm install`, puis `npm run dev`.
+```powershell
+cd ai-service; python -m pip install -r requirements.txt; python -m uvicorn app.main:app --reload --port 8000
+cd backend; .\mvnw.cmd spring-boot:run
+cd frontend; npm ci; npm run dev
+```
 
-Les services utilisent les ports React `5173`, Spring Boot `8081`, FastAPI `8000`, PostgreSQL `5432` et Qdrant `6333`.
-
-Voir le [README principal](README.md), le [contrat backend-IA](backend/docs/ROUTAGE_SAE_IA.md) et les [critères Sprint 2](docs/SPRINT2_ACCEPTANCE.md).
+Consulter le [README](README.md) pour l'architecture, les tests, la sécurité et le processus de livraison, puis l'[audit Sprint 4](docs/FINALIZATION_AUDIT.md) avant une fusion dans `main`.

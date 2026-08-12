@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" role="img" aria-labelledby="title desc">
+  <title id="title">Engineering Copilot</title>
+  <desc id="desc">Logo bleu et cyan représentant un circuit et le nom Engineering Copilot</desc>
+  <defs>
+    <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+      <stop stop-color="#0f3d91"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="160" rx="28" fill="#071428"/>
+  <path d="M44 80 80 44l36 36-36 36zM80 28v18m0 68v18m-52-52h18m68 0h18M45 45l13 13m44 44 13 13m0-70-13 13m-44 44-13 13" fill="none" stroke="url(#g)" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="80" cy="80" r="17" fill="url(#g)"/>
+  <text x="160" y="76" fill="#f8fafc" font-family="Arial, Helvetica, sans-serif" font-size="42" font-weight="700">Engineering</text>
+  <text x="160" y="116" fill="#67e8f9" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="600">COPILOT</text>
+</svg>

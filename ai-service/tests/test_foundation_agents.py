@@ -253,7 +253,7 @@ def test_documentation_agent_generates_a_sourced_markdown_inventory():
     result = DocumentationAgent(repository_service).run(build_request())
 
     assert result.status == AgentStatus.COMPLETED
-    assert result.documentation.title.startswith("Documentation technique")
+    assert result.documentation.title.startswith("Technical documentation")
     assert "README.md" in result.documentation.markdown
     assert result.findings == []
 
@@ -268,7 +268,7 @@ def test_documentation_agent_generates_without_a_readme():
     result = DocumentationAgent(repository_service).run(build_request())
 
     assert result.status == AgentStatus.COMPLETED
-    assert "README, s'il est présent" in result.documentation.markdown
+    assert "README.md" not in result.documentation.source_paths
     assert "pom.xml" in result.documentation.source_paths
 
 

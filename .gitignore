@@ -25,6 +25,8 @@ Thumbs.db
 
 # Testing
 .pytest_cache/
+**/.pytest_cache/
+**/pytest-cache-files-*/
 .coverage
 htmlcov/
 
@@ -33,6 +35,7 @@ build/
 dist/
 **/node_modules/
 **/.vite/
+*.tsbuildinfo
 *.egg-info/
 
 # Jupyter
