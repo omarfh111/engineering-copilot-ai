@@ -9,7 +9,19 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                script {
+                    // Prevent Git clone timeout and RPC buffer issues
+                    sh 'git config --global http.postBuffer 524288000'
+                    sh 'git config --global http.version HTTP/1.1'
+                }
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'sprint4']],
+                    userRemoteConfigs: [[url: 'https://github.com/omarfh111/engineering-copilot-ai.git']],
+                    extensions: [
+                        [$class: 'CloneOption', depth: 1, noTags: true, reference: '', shallow: true, timeout: 30]
+                    ]
+                ])
             }
         }
 
@@ -37,13 +49,11 @@ pipeline {
                     sh '''
                         set -eux
                         
-                        # Configure npm timeouts and retry counts for network stability
                         npm config set fetch-retry-mintimeout 20000
                         npm config set fetch-retry-maxtimeout 120000
                         npm config set fetch-timeout 300000
                         npm config set fetch-retries 5
 
-                        # Attempt install; fallback to public mirror if default registry hangs
                         npm ci || (npm config set registry https://registry.npmmirror.com/ && npm ci)
                         
                         npm run build
@@ -71,9 +81,6 @@ pipeline {
     post {
         success {
             echo 'Validation completed successfully. Deployment remains a separate, explicitly approved operation.'
-        }
-        always {
-            cleanWs()
         }
     }
 }
