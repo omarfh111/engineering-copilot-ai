@@ -53,19 +53,15 @@ pipeline {
         }
 
         stage('AI service tests') {
-            agent {
-                docker {
-                    image 'python:3.11-slim'
-                    reuseNode true
-                }
-            }
             steps {
                 dir('ai-service') {
                     sh '''
                         set -eux
-                        python -m pip install --upgrade pip
-                        python -m pip install -r requirements.txt
-                        python -m pytest -q
+                        docker run --rm -v "$PWD":/app -w /app python:3.11-slim sh -c "
+                            pip install --upgrade pip && \
+                            pip install -r requirements.txt && \
+                            pytest -q
+                        "
                     '''
                 }
             }
