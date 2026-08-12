@@ -5,6 +5,16 @@ from pathlib import Path
 
 import pytest
 
+# These files are ad-hoc, manually executed diagnostics.  They have no pytest
+# test functions and establish real database connections during import, which
+# makes a normal CI run depend on a locally running PostgreSQL instance.
+collect_ignore = [
+    "test_api.py",
+    "test_config.py",
+    "test_postgres_engine.py",
+    "test_session.py",
+]
+
 
 LIVE_PROVIDER_TEST_FILES = {
     "test_document_ingestion_service.py",

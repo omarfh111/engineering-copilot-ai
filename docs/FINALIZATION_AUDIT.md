@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | Historique Git | Conforme | `main` est un ancêtre de `sprint4` ; les branches `Sprint2`, `Sprint3`, `sae` et `sprint4` existent sur `origin`. |
 | Frontend | Conforme avec réserve | `npm run build` réussit ; le bundle JavaScript principal fait 834 kB minifié, au-dessus du seuil d'avertissement de Vite. |
-| Service IA | Corrigé et vérifiable | Pytest ne collecte désormais que `ai-service/tests` et exclut les tests d'intégration externes par défaut. |
+| Service IA | Corrigé et vérifiable | Pytest ne collecte que les vrais tests de `ai-service/tests`, exclut les diagnostics connectés à PostgreSQL et les intégrations externes par défaut. |
 | Backend | Non validé localement | L'environnement disponible est Java 8 alors que le projet compile avec Java 21 ; Maven ne peut en outre pas valider le certificat du dépôt Central. |
 | CI | Ajoutée | `.github/workflows/ci.yml` construit le frontend, teste le service IA et compile/teste l'unité backend sous Java 21. |
 | Jenkins | À corriger avant emploi | Le pipeline actuel tente un `docker compose` à la racine, sans fichier Compose ni Dockerfile racine, et déploie automatiquement. |
