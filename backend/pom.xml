@@ -60,6 +60,16 @@
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
+        <!-- Explicit mail APIs keep IDE and Maven classpaths aligned. Versions are managed by Spring Boot. -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-support</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.angus</groupId>
+            <artifactId>jakarta.mail</artifactId>
+        </dependency>
+
         <!-- REST Client -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
