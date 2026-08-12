@@ -1,0 +1,52 @@
+# Infrastructure dependencies for local development (Sprint 2).
+#
+# This compose file starts ONLY the stateful backing services that the SAE
+# backend and the FastAPI IA service need: PostgreSQL and Qdrant.
+#
+# The Spring Boot backend, the FastAPI IA service and the React frontend are
+# still run from their own toolchains (mvnw / uvicorn / npm) — see README.md.
+# A full application compose is planned for a later sprint.
+#
+#   docker compose up -d          # start Postgres + Qdrant
+#   docker compose down           # stop them (data is kept in named volumes)
+#   docker compose down -v        # stop and DELETE data
+#
+# Credentials match src/main/resources/application.properties.
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: copilote-postgres
+    environment:
+      POSTGRES_DB: copilote_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - copilote_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d copilote_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: copilote-qdrant
+    ports:
+      - "6333:6333"   # REST + dashboard (http://localhost:6333/dashboard)
+      - "6334:6334"   # gRPC
+    volumes:
+      - copilote_qdrant:/qdrant/storage
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: copilote-mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI (http://localhost:8025)
+
+volumes:
+  copilote_pgdata:
+  copilote_qdrant:

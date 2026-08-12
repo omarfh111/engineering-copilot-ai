@@ -25,12 +25,17 @@ Thumbs.db
 
 # Testing
 .pytest_cache/
+**/.pytest_cache/
+**/pytest-cache-files-*/
 .coverage
 htmlcov/
 
 # Distribution
 build/
 dist/
+**/node_modules/
+**/.vite/
+*.tsbuildinfo
 *.egg-info/
 
 # Jupyter
@@ -48,3 +53,7 @@ dist/
 # Temporary files
 *.tmp
 *.bak
+
+# Runtime-uploaded documents: keep local data out of the source repository.
+/storage/documents/*
+!/storage/documents/.gitkeep
