@@ -36,7 +36,16 @@ pipeline {
                 dir('frontend') {
                     sh '''
                         set -eux
-                        npm ci
+                        
+                        # Configure npm timeouts and retry counts for network stability
+                        npm config set fetch-retry-mintimeout 20000
+                        npm config set fetch-retry-maxtimeout 120000
+                        npm config set fetch-timeout 300000
+                        npm config set fetch-retries 5
+
+                        # Attempt install; fallback to public mirror if default registry hangs
+                        npm ci || (npm config set registry https://registry.npmmirror.com/ && npm ci)
+                        
                         npm run build
                     '''
                 }
