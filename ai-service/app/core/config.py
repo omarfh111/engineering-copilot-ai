@@ -7,66 +7,66 @@ class Settings(BaseSettings):
     # ===============================
     # Application
     # ===============================
-    APP_NAME: str
-    APP_ENV: str
-    APP_HOST: str
-    APP_PORT: int
+    APP_NAME: str = "Engineering Copilot AI"
+    APP_ENV: str = "development"
+    APP_HOST: str = "0.0.0.0"
+    APP_PORT: int = 8000
 
-    DEBUG: bool
-    LOG_LEVEL: str
-    FRONTEND_URL: str
+    DEBUG: bool = False
+    LOG_LEVEL: str = "INFO"
+    FRONTEND_URL: str = "http://localhost:5173"
 
     # ===============================
     # LangSmith
     # ===============================
-    LANGCHAIN_TRACING_V2: bool
-    LANGCHAIN_API_KEY: str
-    LANGCHAIN_PROJECT: str
-    LANGCHAIN_ENDPOINT: str
+    LANGCHAIN_TRACING_V2: bool = False
+    LANGCHAIN_API_KEY: str = ""
+    LANGCHAIN_PROJECT: str = "engineering-copilot-rag"
+    LANGCHAIN_ENDPOINT: str = "https://api.smith.langchain.com"
 
     # ===============================
     # Providers
     # ===============================
-    LLM_PROVIDER: str
-    VECTOR_DB: str
-    GIT_PROVIDER: str
+    LLM_PROVIDER: str = "openai"
+    VECTOR_DB: str = "qdrant"
+    GIT_PROVIDER: str = "github"
 
     # ===============================
     # OpenAI
     # ===============================
-    OPENAI_API_KEY: str
-    OPENAI_MODEL: str
-    OPENAI_TEMPERATURE: float
+    OPENAI_API_KEY: str = ""
+    OPENAI_MODEL: str = "gpt-4o-mini"
+    OPENAI_TEMPERATURE: float = 0.2
 
     # ===============================
     # Ollama
     # ===============================
-    OLLAMA_HOST: str
-    OLLAMA_MODEL: str
+    OLLAMA_HOST: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "qwen3-embedding:8b"
 
     # ===============================
     # Embeddings
     # ===============================
-    EMBEDDING_PROVIDER: str
-    EMBEDDING_MODEL: str
-    HUGGINGFACE_API_KEY: str
+    EMBEDDING_PROVIDER: str = "openai"
+    EMBEDDING_MODEL: str = "text-embedding-3-small"
+    HUGGINGFACE_API_KEY: str = ""
 
     # ===============================
     # PostgreSQL
     # ===============================
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int
-    POSTGRES_DB: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: str = "engineering_copilot"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str = "postgres"
 
     # ===============================
     # Qdrant
     # ===============================
-    QDRANT_URL: str
-    QDRANT_API_KEY: str
-    QDRANT_COLLECTION: str
-    VECTOR_COLLECTION: str
+    QDRANT_URL: str = "http://localhost:6333"
+    QDRANT_API_KEY: str = ""
+    QDRANT_COLLECTION: str = "exp_openai_text_embedding_3_small"
+    VECTOR_COLLECTION: str = "exp_openai_text_embedding_3_small"
 
     # ===============================
     # SAE <-> IA microservice contract
@@ -88,7 +88,7 @@ class Settings(BaseSettings):
     # ===============================
     # GitHub
     # ===============================
-    GITHUB_TOKEN: str
+    GITHUB_TOKEN: str = ""
     GITHUB_API_BASE_URL: str = "https://api.github.com"
     REPOSITORY_MAX_FILES: int = 2_000
     REPOSITORY_MAX_FILE_BYTES: int = 1_000_000
@@ -97,10 +97,10 @@ class Settings(BaseSettings):
     # ===============================
     # AI Settings
     # ===============================
-    TOP_K: int
-    MAX_CONTEXT_DOCUMENTS: int
-    CHUNK_SIZE: int
-    CHUNK_OVERLAP: int
+    TOP_K: int = 10
+    MAX_CONTEXT_DOCUMENTS: int = 5
+    CHUNK_SIZE: int = 1000
+    CHUNK_OVERLAP: int = 200
 
     model_config = SettingsConfigDict(
         env_file=".env",

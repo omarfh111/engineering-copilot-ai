@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/omarfh111/engineering-copilot-ai/actions/workflows/ci.yml"><img src="https://github.com/omarfh111/engineering-copilot-ai/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0ea5e9.svg" alt="Licence MIT"></a>
-  <img src="https://img.shields.io/badge/Java-21-0f766e.svg" alt="Java 21">
+  <img src="https://img.shields.io/badge/Java-17-0f766e.svg" alt="Java 17">
   <img src="https://img.shields.io/badge/Python-3.12-3776ab.svg" alt="Python 3.12">
   <img src="https://img.shields.io/badge/Node.js-22-339933.svg" alt="Node.js 22">
 </p>
@@ -35,7 +35,7 @@ React n'appelle jamais FastAPI directement. Pour une ingestion, Spring Boot reç
 | Dossier | Responsabilité | Technologie |
 | --- | --- | --- |
 | `frontend/` | Interface, tableaux de bord, gestion des projets, analyses et revues | React, TypeScript, Vite, Tailwind |
-| `backend/` | API publique, sécurité, règles métier, stockage des documents | Spring Boot, Java 21, PostgreSQL |
+| `backend/` | API publique, sécurité, règles métier, stockage des documents | Spring Boot, Java 17, PostgreSQL |
 | `ai-service/` | Ingestion, RAG, agents d'analyse, recherche vectorielle | FastAPI, Python 3.12, Qdrant |
 | `infra/` | Services d'état locaux | Docker Compose, PostgreSQL, Qdrant, Mailpit |
 | `docs/` | Architecture, plans de test, validation et audit de livraison | Markdown |
@@ -43,7 +43,7 @@ React n'appelle jamais FastAPI directement. Pour une ingestion, Spring Boot reç
 ## Prérequis
 
 - Node.js 22 et npm
-- Java **21** (la configuration Maven cible Java 21)
+- Java **17** ou supérieur (la configuration Maven cible Java 17)
 - Python 3.12
 - Docker Desktop pour PostgreSQL, Qdrant et Mailpit
 - Une clé OpenAI uniquement pour les parcours IA qui appellent le fournisseur

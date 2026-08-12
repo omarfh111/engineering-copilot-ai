@@ -4,7 +4,7 @@ Le dépôt est un monorepo : `frontend/` (React), `backend/` (Spring Boot), `ai-
 
 ## Prérequis
 
-- Java 21, Python 3.12, Node.js 22 et Docker Desktop.
+- Java 17 ou supérieur, Python 3.12, Node.js 22 et Docker Desktop.
 - Une clé OpenAI seulement pour les opérations IA qui sollicitent un modèle externe.
 
 ## Lancer le projet
