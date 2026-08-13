@@ -6,12 +6,6 @@ pipeline {
         disableConcurrentBuilds()
     }
 
-    tools {
-        // Ensure 'NodeJS' matches the tool name under 
-        // Jenkins -> Manage Jenkins -> Global Tool Configuration
-        nodejs 'NodeJS' 
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -35,7 +29,7 @@ pipeline {
                             noTags: true, 
                             reference: '', 
                             shallow: true, 
-                            timeout: 120 // Increased timeout to handle network stalls
+                            timeout: 120
                         ]
                     ]
                 ])
@@ -48,7 +42,6 @@ pipeline {
                     sh '''
                         set -eux
                         chmod +x ./mvnw
-                        # Added network retry options & quiet transfer output (-ntp)
                         ./mvnw -DskipTests package -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.rto=10000 -ntp
                         ./mvnw -Dtest=AuditLogServiceImplTest test -ntp
                     '''
@@ -66,6 +59,9 @@ pipeline {
                 dir('frontend') {
                     sh '''
                         set -eux
+                        
+                        # Export PATH to include standard node/npm locations if installed system-wide
+                        export PATH=$PATH:/usr/local/bin:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
                         
                         npm config set fetch-retry-mintimeout 20000
                         npm config set fetch-retry-maxtimeout 120000
@@ -88,7 +84,6 @@ pipeline {
                         python3 -m venv venv
                         . venv/bin/activate
                         
-                        # Added timeouts and retries for pip to handle slow Wi-Fi connection
                         pip install --default-timeout=1000 --retries 10 --upgrade pip
                         pip install --default-timeout=1000 --retries 10 -r requirements.txt
                         
