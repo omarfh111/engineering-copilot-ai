@@ -67,11 +67,14 @@ pipeline {
                 dir('ai-service') {
                     sh '''
                         set -eux
-                        docker run --rm -v "$PWD":/app -w /app python:3.11-slim sh -c "
-                            pip install --upgrade pip && \
-                            pip install -r requirements.txt && \
-                            pytest -q
-                        "
+                        python3 -m venv venv
+                        . venv/bin/activate
+                        
+                        # Added timeouts and retries for pip to handle slow Wi-Fi connection
+                        pip install --default-timeout=1000 --retries 10 --upgrade pip
+                        pip install --default-timeout=1000 --retries 10 -r requirements.txt
+                        
+                        pytest -q
                     '''
                 }
             }
