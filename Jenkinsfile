@@ -77,6 +77,12 @@ pipeline {
         }
 
         stage('AI service tests') {
+            agent {
+                docker {
+                    image 'python:3.10-slim'
+                    reuseNode true
+                }
+            }
             steps {
                 dir('ai-service') {
                     sh '''
