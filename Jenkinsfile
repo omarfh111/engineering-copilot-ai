@@ -6,6 +6,12 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+    tools {
+        // Ensure 'NodeJS' matches the tool name under 
+        // Jenkins -> Manage Jenkins -> Global Tool Configuration
+        nodejs 'NodeJS' 
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -42,8 +48,9 @@ pipeline {
                     sh '''
                         set -eux
                         chmod +x ./mvnw
-                        ./mvnw -DskipTests package
-                        ./mvnw -Dtest=AuditLogServiceImplTest test
+                        # Added network retry options & quiet transfer output (-ntp)
+                        ./mvnw -DskipTests package -Dmaven.wagon.http.retryHandler.count=5 -Dmaven.wagon.rto=10000 -ntp
+                        ./mvnw -Dtest=AuditLogServiceImplTest test -ntp
                     '''
                 }
             }
