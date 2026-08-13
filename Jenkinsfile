@@ -7,7 +7,7 @@ pipeline {
     }
 
     tools {
-        nodejs 'NodeJS' // Uses the plugin tool you configured in Jenkins Tools
+        nodejs 'NodeJS' // Uses the plugin tool configured in Jenkins
     }
 
     stages {
@@ -77,16 +77,18 @@ pipeline {
         }
 
         stage('AI service tests') {
-            agent {
-                docker {
-                    image 'python:3.10-slim'
-                    reuseNode true
-                }
-            }
             steps {
                 dir('ai-service') {
                     sh '''
                         set -eux
+                        
+                        # Install python3 and venv if not present on the agent
+                        if ! command -v python3 >/dev/null 2>&1; then
+                            echo "Python3 not found. Installing system packages..."
+                            (apt-get update && apt-get install -y python3 python3-pip python3-venv) || \
+                            (sudo apt-get update && sudo apt-get install -y python3 python3-pip python3-venv)
+                        fi
+
                         python3 -m venv venv
                         . venv/bin/activate
                         
