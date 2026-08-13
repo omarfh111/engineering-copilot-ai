@@ -6,11 +6,14 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+    tools {
+        nodejs 'NodeJS' // Uses the plugin tool you configured in Jenkins Tools
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 script {
-                    // Prevent Git clone timeout, HTTP/2 stream errors, and RPC buffer issues on slow connections
                     sh '''
                         git config --global http.postBuffer 1048576000
                         git config --global http.version HTTP/1.1
@@ -59,9 +62,6 @@ pipeline {
                 dir('frontend') {
                     sh '''
                         set -eux
-                        
-                        # Export PATH to include standard node/npm locations if installed system-wide
-                        export PATH=$PATH:/usr/local/bin:~/.nvm/versions/node/$(ls ~/.nvm/versions/node 2>/dev/null | tail -n 1)/bin
                         
                         npm config set fetch-retry-mintimeout 20000
                         npm config set fetch-retry-maxtimeout 120000
