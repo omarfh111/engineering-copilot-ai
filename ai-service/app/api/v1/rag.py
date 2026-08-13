@@ -10,6 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from app.core.logging import logger
+from app.core.config import settings
 from app.services.langchain_rag_service import LangChainRAGService
 from app.api.dependencies import get_langchain_rag_service
 from app.api.security import require_internal_api_key
@@ -17,7 +18,7 @@ from app.api.security import require_internal_api_key
 router = APIRouter(prefix="/rag", tags=["RAG"])
 
 
-DEFAULT_COLLECTION_NAME = "exp_openai_text_embedding_3_small"
+DEFAULT_COLLECTION_NAME = settings.QDRANT_COLLECTION
 
 class RAGAskSimpleRequest(BaseModel):
     question: str = Field(..., min_length=3)

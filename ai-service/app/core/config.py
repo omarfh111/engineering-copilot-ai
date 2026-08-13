@@ -1,6 +1,14 @@
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+# Resolve the environment file from the AI service directory instead of the
+# process working directory. This keeps Qdrant/OpenAI configuration identical
+# when Uvicorn is launched from ai-service, the repository root, or an IDE.
+AI_SERVICE_DIR = Path(__file__).resolve().parents[2]
+DEFAULT_ENV_FILE = AI_SERVICE_DIR / ".env"
 
 
 class Settings(BaseSettings):
@@ -103,7 +111,8 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP: int = 200
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=DEFAULT_ENV_FILE,
+        env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore"
     )

@@ -11,6 +11,7 @@ alembic
 
 tqdm
 qdrant-client
+truststore>=0.10.4; platform_system == "Windows"
 sentence-transformers
 
 langchain
