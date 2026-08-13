@@ -10,16 +10,27 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    // Prevent Git clone timeout and RPC buffer issues
-                    sh 'git config --global http.postBuffer 524288000'
-                    sh 'git config --global http.version HTTP/1.1'
+                    // Prevent Git clone timeout, HTTP/2 stream errors, and RPC buffer issues on slow connections
+                    sh '''
+                        git config --global http.postBuffer 1048576000
+                        git config --global http.version HTTP/1.1
+                        git config --global http.lowSpeedLimit 1000
+                        git config --global http.lowSpeedTime 300
+                    '''
                 }
                 checkout([
                     $class: 'GitSCM',
                     branches: [[name: 'sprint4']],
                     userRemoteConfigs: [[url: 'https://github.com/omarfh111/engineering-copilot-ai.git']],
                     extensions: [
-                        [$class: 'CloneOption', depth: 1, noTags: true, reference: '', shallow: true, timeout: 30]
+                        [
+                            $class: 'CloneOption', 
+                            depth: 1, 
+                            noTags: true, 
+                            reference: '', 
+                            shallow: true, 
+                            timeout: 120 // Increased timeout to handle network stalls
+                        ]
                     ]
                 ])
             }
