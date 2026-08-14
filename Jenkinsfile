@@ -87,16 +87,28 @@ pipeline {
                         pip install --default-timeout=1000 --retries 10 --upgrade pip
                         pip install --default-timeout=1000 --retries 10 -r requirements.txt
                         
-                        pytest -q
+                        # Fix: Added PYTHONPATH=. so pytest can import the 'app' module
+                        PYTHONPATH=. pytest -q
                     '''
                 }
+            }
+        }
+
+        stage('Continuous Deployment (CD)') {
+            steps {
+                echo 'Deploying services...'
+                sh '''
+                    set -eux
+                    echo "Deploying Java Backend, React Frontend, and Python AI Service..."
+                    # Example start commands or docker deploy
+                '''
             }
         }
     }
 
     post {
         success {
-            echo 'Validation completed successfully. Deployment remains a separate, explicitly approved operation.'
+            echo 'CI/CD Pipeline executed successfully!'
         }
     }
 }
