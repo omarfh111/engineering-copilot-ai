@@ -95,26 +95,32 @@ pipeline {
 
         stage('Continuous Deployment (CD)') {
             steps {
-                echo 'Deploying services locally...'
+                echo 'Deploying services locally in background...'
                 sh '''
                     set -eux
 
-                    # Stop previous background processes if running
-                    pkill -f 'backend.*jar' || true
-                    pkill -f 'uvicorn.*main:app' || true
+                    # Tell Jenkins NOT to kill child processes when stage ends
+                    export JENKINS_NODE_COOKIE=dontKillMe
 
-                    # Start AI Service in background
+                    # 1. Stop old instances
+                    pkill -f 'java -jar' || true
+                    pkill -f 'uvicorn app.main:app' || true
+
+                    # 2. Deploy AI Service
                     cd ai-service
                     . venv/bin/activate
                     nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > ai_service.log 2>&1 &
                     cd ..
 
-                    # Start Backend JAR in background
+                    # 3. Deploy Spring Boot Backend
                     cd backend
                     nohup java -jar target/*.jar > backend.log 2>&1 &
                     cd ..
 
-                    echo "All services deployed successfully in background!"
+                    # Allow 3 seconds for background processes to bind ports
+                    sleep 3
+                    
+                    echo "Services actively running in background!"
                 '''
             }
         }
