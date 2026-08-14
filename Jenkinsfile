@@ -87,7 +87,6 @@ pipeline {
                         pip install --default-timeout=1000 --retries 10 --upgrade pip
                         pip install --default-timeout=1000 --retries 10 -r requirements.txt
                         
-                        # Fix: Added PYTHONPATH=. so pytest can import the 'app' module
                         PYTHONPATH=. pytest -q
                     '''
                 }
@@ -96,11 +95,26 @@ pipeline {
 
         stage('Continuous Deployment (CD)') {
             steps {
-                echo 'Deploying services...'
+                echo 'Deploying services locally...'
                 sh '''
                     set -eux
-                    echo "Deploying Java Backend, React Frontend, and Python AI Service..."
-                    # Example start commands or docker deploy
+
+                    # Stop previous background processes if running
+                    pkill -f 'backend.*jar' || true
+                    pkill -f 'uvicorn.*main:app' || true
+
+                    # Start AI Service in background
+                    cd ai-service
+                    . venv/bin/activate
+                    nohup uvicorn app.main:app --host 0.0.0.0 --port 8000 > ai_service.log 2>&1 &
+                    cd ..
+
+                    # Start Backend JAR in background
+                    cd backend
+                    nohup java -jar target/*.jar > backend.log 2>&1 &
+                    cd ..
+
+                    echo "All services deployed successfully in background!"
                 '''
             }
         }
